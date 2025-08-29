@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+	<!-- Meta -->
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<meta name="description" content="Alex Castro - Tech & Sales Blog | Insights on AI, Automation, Sales Strategies, and Development" />
+	<meta name="keywords" content="alex castro, blog, ai, automation, sales, development, technology, insights" />
+	<meta name="author" content="Alex Castro" />
+
+	<!-- Title -->
+	<title>Blog - Alex Castro | Tech & Sales Insights</title>
+
+	<!-- Fonts -->
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+	<!-- Anime.js -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+	<!-- Custom Styles -->
+	<link rel="stylesheet" href="css/modern-style.css" />
+	<link rel="stylesheet" href="css/blog-style.css" />
+
+	<link rel="shortcut icon" href="images/favicons/favicon.ico">
+</head>
+
+<body class="blog-page">
+	<!-- Navigation -->
+	<nav class="navbar" id="navbar">
+		<div class="nav-container">
+			<div class="nav-logo"></div>
+
+			<div class="nav-menu" id="nav-menu">
+				<a href="index.html" class="nav-link">Home</a>
+				<a href="index.html#about" class="nav-link">About</a>
+				<a href="index.html#journey" class="nav-link">Evolution</a>
+				<a href="index.html#portfolio" class="nav-link">Portfolio</a>
+				<a href="index.html#contact" class="nav-link">Contact</a>
+			</div>
+
+			<div class="nav-actions">
+				<a href="cv/cv.pdf" target="_blank" class="btn-secondary cv-download">
+					<i class="fas fa-download"></i>
+					<span>Download CV</span>
+				</a>
+				<a href="index.html#contact" class="btn-primary">Get In Touch</a>
+				<div class="hamburger" id="hamburger">
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+			</div>
+		</div>
+	</nav>
+
+	<!-- Blog Header -->
+	<section class="blog-header">
+		<div class="blog-header-content">
+			<div class="blog-title-section">
+				<h1 class="blog-main-title">Tech & Sales Insights</h1>
+				<p class="blog-subtitle">Exploring AI, automation, sales strategies, and development insights</p>
+			</div>
+			
+			<!-- Blog Search & Filters -->
+			<div class="blog-controls">
+				<div class="search-container">
+					<div class="search-box">
+						<i class="fas fa-search"></i>
+						<input type="text" id="blogSearch" placeholder="Search articles..." />
+					</div>
+				</div>
+				
+				<div class="filter-container">
+					<select id="categoryFilter" class="category-filter">
+						<option value="">All Categories</option>
+						<option value="ai">AI & Automation</option>
+						<option value="sales">Sales Strategies</option>
+						<option value="development">Development</option>
+						<option value="insights">Business Insights</option>
+					</select>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Blog Content -->
+	<section class="blog-content">
+		<div class="blog-container">
+			<!-- Blog Posts Grid -->
+			<div class="blog-posts-section">
+				<div class="posts-header">
+					<div class="posts-count">
+						<span id="postsCount">Loading posts...</span>
+					</div>
+					<div class="sort-options">
+						<select id="sortBy" class="sort-select">
+							<option value="date-desc">Latest First</option>
+							<option value="date-asc">Oldest First</option>
+							<option value="title">Title A-Z</option>
+							<option value="popular">Most Popular</option>
+						</select>
+					</div>
+				</div>
+
+				<!-- Posts Grid (2 columns, 5 rows = 10 posts) -->
+				<div class="posts-grid" id="postsGrid">
+					<!-- Blog post cards will be dynamically inserted here -->
+					<div class="loading-posts">
+						<div class="loading-spinner"></div>
+						<p>Loading amazing content...</p>
+					</div>
+				</div>
+
+				<!-- Pagination -->
+				<div class="pagination-container" id="paginationContainer">
+					<div class="pagination">
+						<button class="pagination-btn prev-btn" id="prevBtn" disabled>
+							<i class="fas fa-chevron-left"></i>
+							<span>Previous</span>
+						</button>
+						
+						<div class="pagination-numbers" id="paginationNumbers">
+							<!-- Page numbers will be dynamically inserted -->
+						</div>
+						
+						<button class="pagination-btn next-btn" id="nextBtn">
+							<span>Next</span>
+							<i class="fas fa-chevron-right"></i>
+						</button>
+					</div>
+					
+					<div class="pagination-info">
+						<span id="paginationInfo">Page 1 of 1</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Blog Sidebar -->
+			<div class="blog-sidebar">
+				<!-- Featured Post -->
+				<div class="sidebar-widget featured-post">
+					<h3 class="widget-title">Featured Article</h3>
+					<div class="featured-content" id="featuredPost">
+						<!-- Featured post will be dynamically inserted -->
+						<div class="featured-loading">
+							<div class="loading-spinner small"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Categories -->
+				<div class="sidebar-widget categories">
+					<h3 class="widget-title">Categories</h3>
+					<div class="categories-list" id="categoriesList">
+						<!-- Categories will be dynamically inserted -->
+						<div class="categories-loading">
+							<div class="loading-spinner small"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Popular Posts -->
+				<div class="sidebar-widget popular-posts">
+					<h3 class="widget-title">Popular Posts</h3>
+					<div class="popular-list" id="popularList">
+						<!-- Popular posts will be dynamically inserted -->
+						<div class="popular-loading">
+							<div class="loading-spinner small"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Tags Cloud -->
+				<div class="sidebar-widget tags-cloud">
+					<h3 class="widget-title">Topics</h3>
+					<div class="tags-container" id="tagsContainer">
+						<!-- Tags will be dynamically inserted -->
+						<div class="tags-loading">
+							<div class="loading-spinner small"></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Newsletter Signup -->
+				<div class="sidebar-widget newsletter">
+					<h3 class="widget-title">Stay Updated</h3>
+					<p class="newsletter-description">Get notified about new articles and insights</p>
+					<form class="newsletter-form" id="newsletterForm">
+						<input type="email" placeholder="Your email address" required />
+						<button type="submit" class="newsletter-btn">
+							<i class="fas fa-paper-plane"></i>
+							<span>Subscribe</span>
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<footer class="blog-footer">
+		<div class="footer-content">
+			<div class="footer-info">
+				<p>&copy; 2024 Alex Castro. All rights reserved.</p>
+				<div class="footer-links">
+					<a href="index.html">Home</a>
+					<a href="index.html#contact">Contact</a>
+					<a href="cv/cv.pdf" target="_blank">Download CV</a>
+				</div>
+			</div>
+			<div class="footer-social">
+				<a href="https://www.linkedin.com/in/alex-castro-422b39261" target="_blank" class="social-link">
+					<i class="fab fa-linkedin-in"></i>
+				</a>
+				<a href="https://wa.me/573012372817" target="_blank" class="social-link">
+					<i class="fab fa-whatsapp"></i>
+				</a>
+				<a href="mailto:mod1ns1d3@gmail.com" class="social-link">
+					<i class="fas fa-envelope"></i>
+				</a>
+			</div>
+		</div>
+	</footer>
+
+	<!-- Blog JavaScript -->
+	<script src="js/blog-animations.js"></script>
+	<script src="js/blog-airtable.js"></script>
+</body>
+</html>
