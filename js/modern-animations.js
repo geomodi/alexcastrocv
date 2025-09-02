@@ -899,6 +899,28 @@ function initCardHoverEffectsForSection(section) {
             });
         });
 
+        // Add mobile-specific scroll handling to prevent scroll trapping
+        if (window.innerWidth <= 768) {
+            card.addEventListener('wheel', function(e) {
+                const scrollableContent = this.querySelector('.scrollable-content');
+                if (scrollableContent) {
+                    const isAtTop = scrollableContent.scrollTop === 0;
+                    const isAtBottom = scrollableContent.scrollTop + scrollableContent.clientHeight >= scrollableContent.scrollHeight;
+
+                    // Allow parent scroll when at boundaries
+                    if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+                        // Don't prevent default - allow parent scroll
+                        return;
+                    }
+
+                    // Only prevent default if we're scrolling within the card content
+                    if (!isAtTop && !isAtBottom) {
+                        e.stopPropagation();
+                    }
+                }
+            }, { passive: false });
+        }
+
         card.addEventListener('mouseleave', function() {
             // Remove hover class
             this.classList.remove('card-hover');
@@ -1032,8 +1054,8 @@ function initEvolutionAnimations() {
                 }
             });
         }, {
-            threshold: 0.3, // Trigger when 30% of stage is visible
-            rootMargin: '0px 0px -50px 0px'
+            threshold: window.innerWidth <= 768 ? 0.1 : 0.3, // Lower threshold for mobile
+            rootMargin: window.innerWidth <= 768 ? '0px 0px -20px 0px' : '0px 0px -50px 0px'
         });
 
         stageObserver.observe(stage);
@@ -1064,14 +1086,19 @@ function animateStageEntrance(stage, index) {
     // Add the animate-in class for CSS transitions
     stage.classList.add('animate-in');
 
+    // Mobile-optimized animation settings
+    const isMobile = window.innerWidth <= 768;
+    const duration = isMobile ? 400 : 800; // Faster on mobile
+    const easing = isMobile ? 'easeOutQuad' : 'easeOutElastic(1, .8)'; // Simpler easing on mobile
+
     // Animate stage container entrance
     anime({
         targets: stage.querySelector('.stage-container'),
         translateY: [50, 0],
         opacity: [0, 1],
         scale: [0.9, 1],
-        duration: 800,
-        easing: 'easeOutElastic(1, .8)',
+        duration: duration,
+        easing: easing,
         complete: function() {
             // Mark entrance animation as completed
             stage.setAttribute('data-animation-state', 'entrance-completed');
@@ -2295,8 +2322,15 @@ function initMouseTrailParticles() {
     const ctx = globalCanvas.getContext('2d');
     const particles = [];
     const backgroundParticles = [];
-    const maxParticles = 60;
-    const maxBackgroundParticles = 150;
+    // Mobile-optimized particle counts and performance settings
+    const isMobile = window.innerWidth <= 768;
+    const maxParticles = isMobile ? 20 : 60;
+    const maxBackgroundParticles = isMobile ? 50 : 150;
+
+    // Disable cursor trail on mobile for better performance
+    if (isMobile) {
+        document.body.style.cursor = 'auto';
+    }
     let mouse = { x: 0, y: 0 };
     let currentSection = 'hero';
     let targetColors = getSectionColors('hero');
@@ -2856,8 +2890,9 @@ function initMouseTrailParticles() {
     // Interactive elements detection and management
     function updateInteractiveElements() {
         const now = Date.now();
-        // Update every 500ms for performance
-        if (now - lastElementUpdate < 500) return;
+        // Mobile-optimized update frequency: 1000ms on mobile, 500ms on desktop
+        const updateInterval = isMobile ? 1000 : 500;
+        if (now - lastElementUpdate < updateInterval) return;
         lastElementUpdate = now;
 
         interactiveElements = [];
@@ -2900,7 +2935,10 @@ function initMouseTrailParticles() {
             });
         });
 
-        console.log(`🧲 [MAGNETIC] Updated ${interactiveElements.length} interactive elements`);
+        // Reduce console logging on mobile for performance
+        if (!isMobile || Math.random() < 0.1) {
+            console.log(`🧲 [MAGNETIC] Updated ${interactiveElements.length} interactive elements`);
+        }
     }
 
     // Particle pooling system for performance optimization

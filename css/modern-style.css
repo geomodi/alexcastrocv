@@ -38,6 +38,36 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   overflow-x: hidden;
+  overflow-y: auto;
+  /* Mobile touch scrolling optimizations */
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y pinch-zoom;
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  body {
+    touch-action: pan-y pinch-zoom;
+  }
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .evolution-stage {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .scrollable-content {
+    -webkit-overflow-scrolling: auto;
+  }
 }
 
 /* Orbital Preloader Styles */
@@ -669,6 +699,15 @@ body {
   overflow: hidden;
 }
 
+/* Mobile-specific hero optimizations */
+@media (max-width: 768px) {
+  .hero {
+    overflow-x: hidden;
+    overflow-y: visible;
+    padding-top: 80px; /* Add padding to prevent header overlap */
+  }
+}
+
 .hero-background {
   position: absolute;
   top: 0;
@@ -786,6 +825,14 @@ body {
 #about {
   position: relative;
   overflow: hidden;
+}
+
+/* Mobile-specific about section optimizations */
+@media (max-width: 768px) {
+  #about {
+    overflow-x: hidden;
+    overflow-y: visible;
+  }
 }
 
 #about::before {
@@ -1362,6 +1409,7 @@ body {
 
   .hero-content {
     padding: 1rem;
+    padding-top: 2rem; /* Extra top padding for smaller screens */
   }
 
   .profile-container {
@@ -1590,6 +1638,31 @@ body {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--primary-color) transparent;
+  /* Mobile touch scrolling optimizations */
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* Mobile-specific scrollable content optimizations */
+@media (max-width: 768px) {
+  .scrollable-content {
+    /* Reduce scroll trapping on mobile */
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+  }
+
+  /* Fix scroll trapping on mobile cards */
+  .neon-card {
+    /* Allow scroll events to pass through when not actively scrolling card content */
+    pointer-events: auto;
+  }
+
+  .neon-card .scrollable-content {
+    /* Only capture scroll when actually over scrollable content */
+    overscroll-behavior: auto;
+    /* Allow parent scroll when content is at top/bottom */
+    overscroll-behavior-y: auto;
+  }
 }
 
 .scrollable-content::-webkit-scrollbar {
@@ -3485,6 +3558,20 @@ body {
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   --stage-glow: 0;
   position: relative;
+}
+
+/* Mobile-specific Evolution stage optimizations */
+@media (max-width: 768px) {
+  .evolution-stage {
+    transition: all 0.4s ease; /* Faster transitions on mobile */
+  }
+
+  /* Ensure first expanded card is immediately visible on mobile */
+  .evolution-stage.expanded {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+  }
+}
 }
 
 .evolution-stage.animate-in {
