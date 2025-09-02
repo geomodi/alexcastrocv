@@ -8,21 +8,42 @@
 	<meta name="keywords" content="alex castro, ai enthusiast, web developer, automation, virtual assistant, portfolio" />
 	<meta name="author" content="Alex Castro" />
 
+	<!-- Performance & Cache Optimization -->
+	<meta http-equiv="Cache-Control" content="public, max-age=31536000">
+	<meta name="theme-color" content="#0a0a0a">
+	<meta name="msapplication-TileColor" content="#0a0a0a">
+
 	<!-- Title -->
 	<title>Alex Castro - AI Enthusiast & Web Developer</title>
 
-	<!-- Fonts -->
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+	<!-- Resource Hints for Performance -->
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+	<link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-	<!-- Anime.js -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+	<!-- Fonts with preload for critical fonts -->
+	<link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+	<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"">
 
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<!-- Anime.js - Deferred for performance -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" defer></script>
 
-	<!-- Custom Styles -->
-	<link rel="stylesheet" href="css/modern-style.css" />
+	<!-- Font Awesome - Non-blocking load -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+	<noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+	<!-- Critical CSS Inline for Performance -->
+	<style>
+		/* Critical CSS - Above the fold styles only */
+		:root{--primary-color:#00d4ff;--secondary-color:#ff6b6b;--accent-color:#4ecdc4;--bg-primary:#0a0a0a;--bg-secondary:#1a1a1a;--bg-tertiary:#2a2a2a;--text-primary:#ffffff;--text-secondary:#b0b0b0;--text-muted:#666666;--gradient-primary:linear-gradient(135deg,#00d4ff 0%,#4ecdc4 100%);--gradient-secondary:linear-gradient(135deg,#ff6b6b 0%,#ffa726 100%);--shadow-light:0 4px 20px rgba(0,212,255,0.1);--shadow-medium:0 8px 40px rgba(0,212,255,0.2);--shadow-heavy:0 20px 60px rgba(0,0,0,0.3);--border-radius:12px;--transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth;font-size:16px}body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-primary);color:var(--text-primary);line-height:1.6;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y pinch-zoom}.preloader{position:fixed;top:0;left:0;width:100%;height:100vh;background:var(--bg-primary);display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.8s ease,visibility 0.8s ease;overflow:hidden}.preloader.hidden{opacity:0;visibility:hidden}.preloader-content{text-align:center;position:relative;z-index:2}.preloader-skip{position:absolute;top:2rem;right:2rem;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:var(--text-primary);padding:0.5rem 1rem;border-radius:var(--border-radius);cursor:pointer;transition:var(--transition);z-index:10000;font-size:0.9rem;backdrop-filter:blur(10px)}.navigation{position:fixed;top:0;left:0;right:0;background:rgba(10,10,10,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.1);z-index:1000;transition:var(--transition);padding:1rem 0}.nav-container{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:0 2rem}.nav-links{display:flex;list-style:none;gap:2rem}.nav-links a{color:var(--text-secondary);text-decoration:none;font-weight:500;transition:var(--transition);position:relative}.nav-links a:hover{color:var(--primary-color)}.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:radial-gradient(ellipse at center,rgba(0,212,255,0.1) 0%,transparent 70%)}.hero-content{display:grid;grid-template-columns:1fr 1fr;gap:4rem;max-width:1200px;margin:0 auto;padding:2rem;align-items:center}.hero-text{z-index:2}.hero-title{font-size:clamp(2.5rem,5vw,4rem);font-weight:800;margin-bottom:1rem;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}.hero-subtitle{font-size:clamp(1.2rem,2.5vw,1.5rem);color:var(--text-secondary);margin-bottom:2rem;font-weight:300}.typing-container{height:3rem;display:flex;align-items:center}.typing-text{font-size:clamp(1.1rem,2vw,1.3rem);color:var(--primary-color);font-weight:600;font-family:'JetBrains Mono',monospace}.typing-cursor{display:inline-block;width:2px;height:1.2em;background:var(--primary-color);margin-left:2px;animation:blink 1s infinite}@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}.hero-visual{position:relative;display:flex;justify-content:center;align-items:center}.profile-container{position:relative;z-index:2}.profile-image{width:300px;height:300px;border-radius:50%;overflow:hidden;position:relative;border:3px solid var(--primary-color);box-shadow:var(--shadow-medium)}.profile-image img{width:100%;height:100%;object-fit:cover;transition:var(--transition)}.profile-glow{position:absolute;top:-20px;left:-20px;right:-20px;bottom:-20px;background:var(--gradient-primary);border-radius:50%;z-index:-1;opacity:0.3;filter:blur(20px);animation:pulse 3s ease-in-out infinite}@keyframes pulse{0%,100%{transform:scale(1);opacity:0.3}50%{transform:scale(1.1);opacity:0.5}}@media (max-width:768px){.hero{padding-top:80px}.hero-content{grid-template-columns:1fr;gap:2rem;text-align:center;padding:1rem;padding-top:2rem}.profile-image{width:200px;height:200px}.nav-container{padding:0 1rem}.nav-links{gap:1rem}}
+	</style>
+
+	<!-- Non-critical CSS loaded asynchronously -->
+	<link rel="preload" href="css/modern-style.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+	<noscript><link rel="stylesheet" href="css/modern-style.min.css"></noscript>
 
 	<link rel="shortcut icon" href="images/favicons/favicon.ico">
 
@@ -225,7 +246,7 @@
 			<div class="hero-visual">
 				<div class="profile-container">
 					<div class="profile-image profile-glitch">
-						<img src="images/man.png" alt="Alex Castro" />
+						<img src="images/man.png" alt="Alex Castro" loading="eager" decoding="async" />
 						<div class="profile-glow"></div>
 					</div>
 					<div class="floating-elements">
@@ -1272,13 +1293,13 @@
 			</div>
 		</section>
 
-		<!-- EmailJS -->
-		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+		<!-- EmailJS - Deferred -->
+		<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
 
-		<!-- Modern Preloader -->
-	<script src="js/preloader-modern.js?v=1.2"></script>
+		<!-- Modern Preloader - Critical, load immediately -->
+	<script src="js/preloader-modern.min.js?v=1.4"></script>
 
-	<!-- Custom JavaScript -->
-		<script src="js/modern-animations.js?v=1.2"></script>
+	<!-- Custom JavaScript - Deferred and minified -->
+		<script src="js/modern-animations.min.js?v=1.4" defer></script>
 	</body>
 	</html>
