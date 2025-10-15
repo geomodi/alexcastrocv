@@ -684,6 +684,20 @@ function initNavigation() {
     });
 }
 
+// Throttle utility function for performance optimization
+function throttle(func, limit) {
+    let inThrottle;
+    return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    }
+}
+
 // Scroll Animations
 function initScrollAnimations() {
     // Scroll indicator click
@@ -693,17 +707,21 @@ function initScrollAnimations() {
             behavior: 'smooth'
         });
     });
-    
-    // Parallax effect for hero background
-    window.addEventListener('scroll', function() {
-        const scrolled = window.pageYOffset;
-        const parallax = document.querySelector('.hero-background');
-        const speed = scrolled * 0.5;
-        
-        if (parallax) {
-            parallax.style.transform = `translateY(${speed}px)`;
-        }
-    });
+
+    // Parallax effect for hero background - DISABLED ON MOBILE for performance
+    if (window.innerWidth > 768) {
+        const handleParallax = throttle(function() {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.hero-background');
+            const speed = scrolled * 0.5;
+
+            if (parallax) {
+                parallax.style.transform = `translateY(${speed}px)`;
+            }
+        }, 16); // ~60fps throttle
+
+        window.addEventListener('scroll', handleParallax, { passive: true });
+    }
 }
 
 // Button Hover Animations
@@ -802,15 +820,16 @@ function initCardAnimations() {
                     return;
                 }
 
-                // Animate cards with completion tracking
-                anime({
+                // Animate cards with completion tracking - OPTIMIZED FOR MOBILE
+                const isMobile = window.innerWidth <= 768;
+                const animationConfig = {
                     targets: cards,
                     translateY: [50, 0],
                     opacity: [0, 1],
                     scale: [0.9, 1],
-                    duration: 800,
-                    easing: 'easeOutElastic(1, .8)',
-                    delay: anime.stagger(200),
+                    duration: isMobile ? 600 : 800, // Shorter duration on mobile
+                    easing: isMobile ? 'easeOutQuad' : 'easeOutElastic(1, .8)', // Simpler easing on mobile
+                    delay: anime.stagger(isMobile ? 100 : 200), // Reduced stagger on mobile
                     complete: function() {
                         console.log(`🎬 [CARDS] Cards animation completed for section: ${sectionId}`);
 
@@ -823,7 +842,9 @@ function initCardAnimations() {
                             initCardHoverEffectsForSection(section);
                         }, 100);
                     }
-                });
+                };
+
+                anime(animationConfig);
 
                 // Animate section titles
                 animateSectionTitles(section);
@@ -899,27 +920,9 @@ function initCardHoverEffectsForSection(section) {
             });
         });
 
-        // Add mobile-specific scroll handling to prevent scroll trapping
-        if (window.innerWidth <= 768) {
-            card.addEventListener('wheel', function(e) {
-                const scrollableContent = this.querySelector('.scrollable-content');
-                if (scrollableContent) {
-                    const isAtTop = scrollableContent.scrollTop === 0;
-                    const isAtBottom = scrollableContent.scrollTop + scrollableContent.clientHeight >= scrollableContent.scrollHeight;
-
-                    // Allow parent scroll when at boundaries
-                    if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
-                        // Don't prevent default - allow parent scroll
-                        return;
-                    }
-
-                    // Only prevent default if we're scrolling within the card content
-                    if (!isAtTop && !isAtBottom) {
-                        e.stopPropagation();
-                    }
-                }
-            }, { passive: false });
-        }
+        // REMOVED: Mobile wheel event listener was causing scroll blocking
+        // The passive: false and stopPropagation() were interfering with native scroll handling
+        // CSS overscroll-behavior is sufficient to prevent scroll trapping on mobile
 
         card.addEventListener('mouseleave', function() {
             // Remove hover class
@@ -3422,8 +3425,13 @@ function initCleanAnimatedWave() {
         }
     }
 
-    // Scroll-based wave behavior
+    // Scroll-based wave behavior - OPTIMIZED FOR MOBILE
     function handleWaveScroll() {
+        // DISABLED ON MOBILE for performance - wave animations cause scroll hang
+        if (window.innerWidth <= 768) {
+            return;
+        }
+
         const scrollY = window.scrollY;
         const heroHeight = heroSection ? heroSection.offsetHeight : window.innerHeight;
         scrollProgress = Math.min(scrollY / heroHeight, 1);
@@ -3445,8 +3453,8 @@ function initCleanAnimatedWave() {
             });
         }
 
-        // Parallax effect on hero content
-        if (heroText) {
+        // Parallax effect on hero content - DISABLED ON MOBILE
+        if (heroText && window.innerWidth > 768) {
             const parallaxOffset = scrollProgress * 30;
             anime({
                 targets: heroText,
@@ -3456,6 +3464,9 @@ function initCleanAnimatedWave() {
             });
         }
     }
+
+    // Throttle the wave scroll handler to prevent main thread saturation
+    const throttledWaveScroll = throttle(handleWaveScroll, 32); // ~30fps for wave animations
 
     // Hover effect - enhance wave brightness
     function handleMouseEnter() {
@@ -3563,8 +3574,8 @@ function initCleanAnimatedWave() {
             e.preventDefault();
         });
 
-        // Add scroll listener for wave behavior
-        window.addEventListener('scroll', handleWaveScroll, { passive: true });
+        // Add throttled scroll listener for wave behavior (prevents main thread saturation)
+        window.addEventListener('scroll', throttledWaveScroll, { passive: true });
 
         heroSection.setAttribute('data-wave-initialized', 'true');
         console.log('🌊 [WAVE] ✅ Clean wave interactions and scroll behavior initialized');

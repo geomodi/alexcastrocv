@@ -203,7 +203,6 @@ body {
   left: 50%;
   transform: translate(-50%, -50%) scale(0.1);
   opacity: 0;
-  will-change: transform, opacity;
   backface-visibility: hidden;
 }
 
@@ -242,7 +241,6 @@ body {
   transform-style: preserve-3d;
   opacity: 0;
   transform: scale(0) translateZ(0);
-  will-change: transform, opacity;
   backface-visibility: hidden;
 }
 
@@ -366,7 +364,6 @@ body {
   letter-spacing: 2px;
   margin-bottom: 1rem;
   font-family: 'Courier New', monospace;
-  will-change: contents;
 }
 
 .progress-bar {
@@ -384,7 +381,6 @@ body {
   border-radius: 2px;
   width: 0%;
   box-shadow: 0 0 10px var(--primary-color);
-  will-change: width;
   transform: translateZ(0);
 }
 
@@ -392,7 +388,6 @@ body {
   color: var(--text-secondary);
   font-size: 0.8rem;
   font-family: 'Courier New', monospace;
-  will-change: contents;
 }
 
 /* Loading Status Indicator */
@@ -3348,7 +3343,6 @@ body {
 /* Enhanced Button Hover States */
 .btn-primary, .btn-secondary {
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: transform;
 }
 
 .btn-primary:hover, .btn-secondary:hover {
@@ -3358,12 +3352,10 @@ body {
 /* Profile Image Scroll Rotation */
 .profile-image {
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: transform;
 }
 
 /* Floating Icons Orbital Motion */
 .floating-icon {
-  will-change: transform;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -3657,7 +3649,6 @@ body {
 .evolution-stage.evolution-hover-enabled .company-card,
 .evolution-stage.evolution-hover-enabled .skill-node {
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: transform;
 }
 
 /* Stage Header */
