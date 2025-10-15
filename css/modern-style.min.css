@@ -1857,8 +1857,9 @@ body {
 /* Mobile-specific scrollable content optimizations */
 @media (max-width: 768px) {
   .scrollable-content {
-    /* Reduce scroll trapping on mobile */
-    overscroll-behavior: contain;
+    /* FIX: Use 'auto' instead of 'contain' to allow scroll propagation */
+    /* This prevents scroll trapping and allows page scroll to work smoothly */
+    overscroll-behavior: auto;
     touch-action: pan-y;
   }
 
@@ -1869,7 +1870,7 @@ body {
   }
 
   .neon-card .scrollable-content {
-    /* Only capture scroll when actually over scrollable content */
+    /* Consistent with parent: allow scroll propagation */
     overscroll-behavior: auto;
     /* Allow parent scroll when content is at top/bottom */
     overscroll-behavior-y: auto;

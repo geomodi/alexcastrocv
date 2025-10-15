@@ -827,9 +827,9 @@ function initCardAnimations() {
                     translateY: [50, 0],
                     opacity: [0, 1],
                     scale: [0.9, 1],
-                    duration: isMobile ? 600 : 800, // Shorter duration on mobile
+                    duration: isMobile ? 350 : 800, // REDUCED: 600ms → 350ms on mobile to prevent scroll blocking
                     easing: isMobile ? 'easeOutQuad' : 'easeOutElastic(1, .8)', // Simpler easing on mobile
-                    delay: anime.stagger(isMobile ? 100 : 200), // Reduced stagger on mobile
+                    delay: anime.stagger(isMobile ? 50 : 200), // REDUCED: 100ms → 50ms stagger on mobile
                     complete: function() {
                         console.log(`🎬 [CARDS] Cards animation completed for section: ${sectionId}`);
 
@@ -837,10 +837,9 @@ function initCardAnimations() {
                         section.setAttribute('data-cards-animated', 'true');
                         section.setAttribute('data-animation-state', 'completed');
 
-                        // Initialize hover effects for cards after entrance animation completes
-                        setTimeout(() => {
-                            initCardHoverEffectsForSection(section);
-                        }, 100);
+                        // Initialize hover effects for cards immediately (no setTimeout delay)
+                        // This prevents additional blocking time
+                        initCardHoverEffectsForSection(section);
                     }
                 };
 
@@ -854,7 +853,7 @@ function initCardAnimations() {
         });
     }, {
         threshold: 0.2,
-        rootMargin: '0px 0px -100px 0px'
+        rootMargin: '0px 0px -50px 0px' // REDUCED: -100px → -50px to trigger animation later and reduce scroll blocking
     });
 
     // Helper function to animate section titles
