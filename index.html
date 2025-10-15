@@ -59,69 +59,37 @@
 		</button>
 
 		<div class="preloader-content">
-			<!-- Orbital Skill System with Central Name -->
-			<div class="orbit-container" id="orbitContainer">
-				<!-- Central Loading Text with Decoding Animation -->
-				<div class="name-decoder">
-					<div class="decoded-name" id="decodedName">LOADING</div>
-					<div class="decoding-overlay" id="decodingOverlay"></div>
+			<!-- Animated Logo Container -->
+			<div class="logo-container" id="logoContainer">
+				<!-- Central Logo with Animated Letters -->
+				<div class="animated-logo">
+					<span class="logo-letter logo-a" id="logoA">A</span>
+					<span class="logo-letter logo-c" id="logoC">C</span>
 				</div>
-				<!-- Inner Orbit -->
-				<div class="orbit orbit-inner">
-					<div class="skill-icon" data-skill="react">
-						<i class="fab fa-react"></i>
-					</div>
-					<div class="skill-icon" data-skill="js">
-						<i class="fab fa-js-square"></i>
-					</div>
-					<div class="skill-icon" data-skill="python">
-						<i class="fab fa-python"></i>
-					</div>
-					<div class="skill-icon" data-skill="node">
-						<i class="fab fa-node-js"></i>
-					</div>
+				
+				<!-- Rotating Ring -->
+				<div class="rotating-ring" id="rotatingRing">
+					<div class="ring-segment segment-1"></div>
+					<div class="ring-segment segment-2"></div>
+					<div class="ring-segment segment-3"></div>
+					<div class="ring-segment segment-4"></div>
 				</div>
+				
+				<!-- Orbiting Particles -->
+				<div class="particle-orbit" id="particleOrbit">
+					<div class="orbit-particle particle-1"></div>
+					<div class="orbit-particle particle-2"></div>
+					<div class="orbit-particle particle-3"></div>
+					<div class="orbit-particle particle-4"></div>
+					<div class="orbit-particle particle-5"></div>
+					<div class="orbit-particle particle-6"></div>
+				</div>
+			</div>
 
-				<!-- Middle Orbit -->
-				<div class="orbit orbit-middle">
-					<div class="skill-icon" data-skill="html">
-						<i class="fab fa-html5"></i>
-					</div>
-					<div class="skill-icon" data-skill="css">
-						<i class="fab fa-css3-alt"></i>
-					</div>
-					<div class="skill-icon" data-skill="git">
-						<i class="fab fa-git-alt"></i>
-					</div>
-					<div class="skill-icon" data-skill="database">
-						<i class="fas fa-database"></i>
-					</div>
-					<div class="skill-icon" data-skill="cloud">
-						<i class="fas fa-cloud"></i>
-					</div>
-				</div>
-
-				<!-- Outer Orbit -->
-				<div class="orbit orbit-outer">
-					<div class="skill-icon" data-skill="ai">
-						<i class="fas fa-brain"></i>
-					</div>
-					<div class="skill-icon" data-skill="analytics">
-						<i class="fas fa-chart-line"></i>
-					</div>
-					<div class="skill-icon" data-skill="automation">
-						<i class="fas fa-robot"></i>
-					</div>
-					<div class="skill-icon" data-skill="design">
-						<i class="fas fa-palette"></i>
-					</div>
-					<div class="skill-icon" data-skill="mobile">
-						<i class="fas fa-mobile-alt"></i>
-					</div>
-					<div class="skill-icon" data-skill="api">
-						<i class="fas fa-plug"></i>
-					</div>
-				</div>
+			<!-- Loading Text -->
+			<div class="loading-text-container">
+				<div class="loading-text" id="loadingText">Initializing...</div>
+				<div class="loading-status" id="loadingStatus">Loading resources</div>
 			</div>
 
 			<!-- Loading Progress -->
@@ -135,8 +103,14 @@
 
 		<!-- Background Effects -->
 		<div class="preloader-background">
-			<div class="grid-overlay"></div>
-			<div class="scan-lines"></div>
+			<div class="animated-grid"></div>
+			<div class="floating-particles" id="floatingParticles">
+				<div class="bg-particle bg-particle-1"></div>
+				<div class="bg-particle bg-particle-2"></div>
+				<div class="bg-particle bg-particle-3"></div>
+				<div class="bg-particle bg-particle-4"></div>
+				<div class="bg-particle bg-particle-5"></div>
+			</div>
 		</div>
 	</div>
 
