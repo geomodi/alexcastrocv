@@ -76,9 +76,10 @@ function initPreloader() {
 function initHeroAnimations() {
     console.log('🎬 [HERO] Initializing hero animations...');
 
-    // Check if hero animations already initialized AND completed
-    if (document.body.hasAttribute('data-hero-animations-completed')) {
-        console.log('🎬 [HERO] ❌ Hero animations already completed, skipping...');
+    // Check if hero animations already initialized OR completed
+    if (document.body.hasAttribute('data-hero-animations-initialized') ||
+        document.body.hasAttribute('data-hero-animations-completed')) {
+        console.log('🎬 [HERO] ❌ Hero animations already initialized or completed, skipping...');
         return;
     }
 
@@ -684,20 +685,6 @@ function initNavigation() {
     });
 }
 
-// Throttle utility function for performance optimization
-function throttle(func, limit) {
-    let inThrottle;
-    return function() {
-        const args = arguments;
-        const context = this;
-        if (!inThrottle) {
-            func.apply(context, args);
-            inThrottle = true;
-            setTimeout(() => inThrottle = false, limit);
-        }
-    }
-}
-
 // Scroll Animations
 function initScrollAnimations() {
     // Scroll indicator click
@@ -707,21 +694,17 @@ function initScrollAnimations() {
             behavior: 'smooth'
         });
     });
-
-    // Parallax effect for hero background - DISABLED ON MOBILE for performance
-    if (window.innerWidth > 768) {
-        const handleParallax = throttle(function() {
-            const scrolled = window.pageYOffset;
-            const parallax = document.querySelector('.hero-background');
-            const speed = scrolled * 0.5;
-
-            if (parallax) {
-                parallax.style.transform = `translateY(${speed}px)`;
-            }
-        }, 16); // ~60fps throttle
-
-        window.addEventListener('scroll', handleParallax, { passive: true });
-    }
+    
+    // Parallax effect for hero background
+    window.addEventListener('scroll', function() {
+        const scrolled = window.pageYOffset;
+        const parallax = document.querySelector('.hero-background');
+        const speed = scrolled * 0.5;
+        
+        if (parallax) {
+            parallax.style.transform = `translateY(${speed}px)`;
+        }
+    });
 }
 
 // Button Hover Animations
@@ -820,16 +803,17 @@ function initCardAnimations() {
                     return;
                 }
 
-                // Animate cards with completion tracking - OPTIMIZED FOR MOBILE
+                // Smooth scroll-reveal animation: fade-in + slide-up
+                // Mobile-optimized for 60 FPS performance
                 const isMobile = window.innerWidth <= 768;
-                const animationConfig = {
+
+                anime({
                     targets: cards,
-                    translateY: [50, 0],
+                    translateY: [isMobile ? 30 : 40, 0], // Reduced distance on mobile for better performance
                     opacity: [0, 1],
-                    scale: [0.9, 1],
-                    duration: isMobile ? 350 : 800, // REDUCED: 600ms → 350ms on mobile to prevent scroll blocking
-                    easing: isMobile ? 'easeOutQuad' : 'easeOutElastic(1, .8)', // Simpler easing on mobile
-                    delay: anime.stagger(isMobile ? 50 : 200), // REDUCED: 100ms → 50ms stagger on mobile
+                    duration: isMobile ? 800 : 1000, // Slightly faster on mobile
+                    easing: 'cubicBezier(0.4, 0, 0.2, 1)', // Smooth easing as requested
+                    delay: anime.stagger(isMobile ? 150 : 200), // Slightly faster stagger on mobile
                     complete: function() {
                         console.log(`🎬 [CARDS] Cards animation completed for section: ${sectionId}`);
 
@@ -837,13 +821,12 @@ function initCardAnimations() {
                         section.setAttribute('data-cards-animated', 'true');
                         section.setAttribute('data-animation-state', 'completed');
 
-                        // Initialize hover effects for cards immediately (no setTimeout delay)
-                        // This prevents additional blocking time
-                        initCardHoverEffectsForSection(section);
+                        // Initialize hover effects for cards after entrance animation completes
+                        setTimeout(() => {
+                            initCardHoverEffectsForSection(section);
+                        }, 100);
                     }
-                };
-
-                anime(animationConfig);
+                });
 
                 // Animate section titles
                 animateSectionTitles(section);
@@ -853,7 +836,7 @@ function initCardAnimations() {
         });
     }, {
         threshold: 0.2,
-        rootMargin: '0px 0px -50px 0px' // REDUCED: -100px → -50px to trigger animation later and reduce scroll blocking
+        rootMargin: '0px 0px -100px 0px'
     });
 
     // Helper function to animate section titles
@@ -883,6 +866,46 @@ function initCardAnimations() {
             });
         }
     }
+
+    // Check for cards visible on page load and skip animation for them
+    function handleCardsVisibleOnLoad() {
+        const viewportHeight = window.innerHeight;
+
+        document.querySelectorAll('.section-container').forEach(section => {
+            const sectionRect = section.getBoundingClientRect();
+
+            // If section is in viewport on page load (top is above viewport bottom)
+            if (sectionRect.top < viewportHeight && sectionRect.bottom > 0) {
+                const cards = section.querySelectorAll('.neon-card');
+
+                cards.forEach(card => {
+                    const cardRect = card.getBoundingClientRect();
+
+                    // If card is visible on page load, skip animation
+                    if (cardRect.top < viewportHeight && cardRect.bottom > 0) {
+                        card.classList.add('no-animation');
+                        console.log(`🎬 [CARDS] Card visible on load, skipping animation`);
+                    }
+                });
+
+                // If all cards in section are visible, mark section as animated
+                const visibleCards = section.querySelectorAll('.neon-card.no-animation');
+                const allCards = section.querySelectorAll('.neon-card');
+
+                if (visibleCards.length === allCards.length && allCards.length > 0) {
+                    section.setAttribute('data-cards-animated', 'true');
+                    section.setAttribute('data-animation-state', 'completed');
+                    console.log(`🎬 [CARDS] All cards in section visible on load, marking as animated`);
+
+                    // Initialize hover effects immediately for visible cards
+                    initCardHoverEffectsForSection(section);
+                }
+            }
+        });
+    }
+
+    // Run on page load
+    handleCardsVisibleOnLoad();
 
     // Observe all section containers
     document.querySelectorAll('.section-container').forEach(section => {
@@ -919,9 +942,27 @@ function initCardHoverEffectsForSection(section) {
             });
         });
 
-        // REMOVED: Mobile wheel event listener was causing scroll blocking
-        // The passive: false and stopPropagation() were interfering with native scroll handling
-        // CSS overscroll-behavior is sufficient to prevent scroll trapping on mobile
+        // Add mobile-specific scroll handling to prevent scroll trapping
+        if (window.innerWidth <= 768) {
+            card.addEventListener('wheel', function(e) {
+                const scrollableContent = this.querySelector('.scrollable-content');
+                if (scrollableContent) {
+                    const isAtTop = scrollableContent.scrollTop === 0;
+                    const isAtBottom = scrollableContent.scrollTop + scrollableContent.clientHeight >= scrollableContent.scrollHeight;
+
+                    // Allow parent scroll when at boundaries
+                    if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+                        // Don't prevent default - allow parent scroll
+                        return;
+                    }
+
+                    // Only prevent default if we're scrolling within the card content
+                    if (!isAtTop && !isAtBottom) {
+                        e.stopPropagation();
+                    }
+                }
+            }, { passive: false });
+        }
 
         card.addEventListener('mouseleave', function() {
             // Remove hover class
@@ -3390,7 +3431,7 @@ function initCleanAnimatedWave() {
 
     console.log('🌊 [WAVE] Wave system ready, setting up interactions...');
 
-    // Simple mouse interaction effects
+    // Subtle mouse interaction effects - barely noticeable
     function handleWaveMouseMove(e) {
         if (!heroSection) return;
 
@@ -3398,122 +3439,114 @@ function initCleanAnimatedWave() {
         mouseX = (e.clientX - rect.left) / rect.width;
         mouseY = (e.clientY - rect.top) / rect.height;
 
-        // Subtle wave brightness effect on mouse move
-        const intensity = 0.8 + (mouseY * 0.3);
+        // Very subtle wave opacity change on mouse move
+        const intensity = 0.18 + (mouseY * 0.05);
         if (wavePrimary) {
             anime({
                 targets: wavePrimary,
                 opacity: intensity,
-                duration: 300,
-                easing: 'easeOutQuad'
+                duration: 600,
+                easing: 'cubicBezier(0.4, 0, 0.2, 1)'
             });
         }
 
-        // Add subtle hero text movement based on mouse position
+        // Minimal hero text movement for subtle parallax
         if (heroText) {
-            const moveX = (mouseX - 0.5) * 8;
-            const moveY = (mouseY - 0.5) * 4;
+            const moveX = (mouseX - 0.5) * 3;
+            const moveY = (mouseY - 0.5) * 2;
 
             anime({
                 targets: heroText,
                 translateX: moveX,
                 translateY: moveY,
-                duration: 800,
-                easing: 'easeOutQuad'
+                duration: 1200,
+                easing: 'cubicBezier(0.4, 0, 0.2, 1)'
             });
         }
     }
 
-    // Scroll-based wave behavior - OPTIMIZED FOR MOBILE
+    // Smooth scroll-based wave behavior for seamless transition
     function handleWaveScroll() {
-        // DISABLED ON MOBILE for performance - wave animations cause scroll hang
-        if (window.innerWidth <= 768) {
-            return;
-        }
-
         const scrollY = window.scrollY;
         const heroHeight = heroSection ? heroSection.offsetHeight : window.innerHeight;
         scrollProgress = Math.min(scrollY / heroHeight, 1);
 
-        // Apply scroll-based transformations to wave container
+        // Apply smooth scroll-based transformations to wave container
         if (waveContainer) {
-            // Smooth fade out and transform as user scrolls
-            const opacity = Math.max(1 - scrollProgress * 1.5, 0);
-            const translateY = scrollProgress * 80;
-            const scaleY = Math.max(1 - scrollProgress * 0.3, 0.7);
+            // Gentle fade out and transform as user scrolls - creates seamless transition
+            const opacity = Math.max(1 - scrollProgress * 2, 0);
+            const translateY = scrollProgress * 100;
+            const scaleY = Math.max(1 - scrollProgress * 0.4, 0.6);
 
             anime({
                 targets: waveContainer,
                 translateY: translateY,
                 opacity: opacity,
                 scaleY: scaleY,
-                duration: 100,
-                easing: 'easeOutQuad'
+                duration: 200,
+                easing: 'cubicBezier(0.4, 0, 0.2, 1)'
             });
         }
 
-        // Parallax effect on hero content - DISABLED ON MOBILE
-        if (heroText && window.innerWidth > 768) {
-            const parallaxOffset = scrollProgress * 30;
+        // Subtle parallax effect on hero content
+        if (heroText) {
+            const parallaxOffset = scrollProgress * 20;
             anime({
                 targets: heroText,
                 translateY: -parallaxOffset,
-                duration: 100,
-                easing: 'easeOutQuad'
+                duration: 200,
+                easing: 'cubicBezier(0.4, 0, 0.2, 1)'
             });
         }
     }
 
-    // Throttle the wave scroll handler to prevent main thread saturation
-    const throttledWaveScroll = throttle(handleWaveScroll, 32); // ~30fps for wave animations
-
-    // Hover effect - enhance wave brightness
+    // Subtle hover effect - barely noticeable enhancement
     function handleMouseEnter() {
-        console.log('🌊 [WAVE] Mouse entered - enhancing wave');
+        console.log('🌊 [WAVE] Mouse entered - subtle enhancement');
         if (wavePrimary) {
             anime({
                 targets: wavePrimary,
-                opacity: 1,
-                filter: 'brightness(1.3)',
-                duration: 600,
-                easing: 'easeOutQuad'
+                opacity: 0.25,
+                filter: 'brightness(1.05)',
+                duration: 800,
+                easing: 'cubicBezier(0.4, 0, 0.2, 1)'
             });
         }
         if (waveSecondary) {
             anime({
                 targets: waveSecondary,
-                opacity: 0.8,
-                filter: 'brightness(1.2)',
-                duration: 600,
-                easing: 'easeOutQuad'
+                opacity: 0.15,
+                filter: 'brightness(1.03)',
+                duration: 800,
+                easing: 'cubicBezier(0.4, 0, 0.2, 1)'
             });
         }
     }
 
-    // Mouse leave - return to normal
+    // Mouse leave - return to subtle state
     function handleMouseLeave() {
-        console.log('🌊 [WAVE] Mouse left - normalizing wave');
+        console.log('🌊 [WAVE] Mouse left - returning to subtle state');
         if (wavePrimary) {
             anime({
                 targets: wavePrimary,
-                opacity: 0.8,
+                opacity: 0.2,
                 filter: 'brightness(1)',
-                duration: 600,
-                easing: 'easeOutQuad'
+                duration: 800,
+                easing: 'cubicBezier(0.4, 0, 0.2, 1)'
             });
         }
         if (waveSecondary) {
             anime({
                 targets: waveSecondary,
-                opacity: 0.6,
+                opacity: 0.12,
                 filter: 'brightness(1)',
-                duration: 600,
-                easing: 'easeOutQuad'
+                duration: 800,
+                easing: 'cubicBezier(0.4, 0, 0.2, 1)'
             });
         }
     }
 
-    // Click effect - wave pulse
+    // Subtle click effect - gentle wave pulse
     function handleMouseClick(e) {
         if (!heroSection) return;
 
@@ -3521,37 +3554,37 @@ function initCleanAnimatedWave() {
         const clickX = (e.clientX - rect.left) / rect.width;
         const clickY = (e.clientY - rect.top) / rect.height;
 
-        // Create wave pulse effect
+        // Create subtle wave pulse effect
         createWavePulse();
 
-        console.log('🌊 [WAVE] Click effect triggered at', clickX, clickY);
+        console.log('🌊 [WAVE] Subtle pulse effect triggered at', clickX, clickY);
     }
 
-    // Create wave pulse effect
+    // Create subtle wave pulse effect
     function createWavePulse() {
-        // Pulse both waves
+        // Gentle pulse on both waves
         if (wavePrimary) {
             anime({
                 targets: wavePrimary,
-                opacity: [0.8, 1, 0.8],
-                filter: ['brightness(1)', 'brightness(1.5)', 'brightness(1)'],
-                duration: 800,
-                easing: 'easeInOutQuad'
+                opacity: [0.2, 0.3, 0.2],
+                filter: ['brightness(1)', 'brightness(1.1)', 'brightness(1)'],
+                duration: 1000,
+                easing: 'cubicBezier(0.4, 0, 0.2, 1)'
             });
         }
 
         if (waveSecondary) {
             anime({
                 targets: waveSecondary,
-                opacity: [0.6, 0.9, 0.6],
-                filter: ['brightness(1)', 'brightness(1.3)', 'brightness(1)'],
-                duration: 800,
-                easing: 'easeInOutQuad',
-                delay: 100
+                opacity: [0.12, 0.18, 0.12],
+                filter: ['brightness(1)', 'brightness(1.05)', 'brightness(1)'],
+                duration: 1000,
+                easing: 'cubicBezier(0.4, 0, 0.2, 1)',
+                delay: 150
             });
         }
 
-        console.log('🌊 [WAVE] Pulse effect triggered');
+        console.log('🌊 [WAVE] Subtle pulse effect applied');
     }
 
 
@@ -3573,8 +3606,8 @@ function initCleanAnimatedWave() {
             e.preventDefault();
         });
 
-        // Add throttled scroll listener for wave behavior (prevents main thread saturation)
-        window.addEventListener('scroll', throttledWaveScroll, { passive: true });
+        // Add scroll listener for wave behavior
+        window.addEventListener('scroll', handleWaveScroll, { passive: true });
 
         heroSection.setAttribute('data-wave-initialized', 'true');
         console.log('🌊 [WAVE] ✅ Clean wave interactions and scroll behavior initialized');
