@@ -1,0 +1,2170 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+	<!-- Meta -->
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+	<meta name="description" content="AiLex - AI-powered image editor by Alex Castro. Create and edit images with Gemini AI and advanced editing tools" />
+	<meta name="keywords" content="ailex, ai image editor, gemini ai, image generation, photo editing, konva.js, alex castro" />
+	<meta name="author" content="Alex Castro" />
+
+	<!-- Performance & Cache Optimization -->
+	<meta http-equiv="Cache-Control" content="public, max-age=31536000">
+	<meta name="theme-color" content="#0a0a0a">
+	<meta name="msapplication-TileColor" content="#0a0a0a">
+
+	<!-- Title -->
+	<title>AiLex - AI Image Editor by Alex Castro</title>
+
+	<!-- Resource Hints for Performance -->
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+	<link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+	<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+	<!-- Fonts with preload for critical fonts -->
+	<link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+	<noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+
+	<!-- Anime.js - Deferred for performance -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" defer></script>
+
+	<!-- Font Awesome - Non-blocking load -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+	<noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+	<!-- Boxicons - For modern icon design -->
+	<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+	<!-- Konva.js for canvas editing -->
+	<script src="https://unpkg.com/konva@9/konva.min.js" defer></script>
+
+	<!-- Main CSS -->
+	<link rel="stylesheet" href="css/modern-style.css">
+	<link rel="stylesheet" href="css/ai-editor.css?v=26">
+
+	<link rel="shortcut icon" href="images/favicons/favicon.ico">
+</head>
+
+<body>
+	<!-- Navigation -->
+	<nav class="navbar" id="navbar">
+		<div class="nav-container">
+			<div class="nav-logo"></div>
+
+			<div class="nav-menu" id="nav-menu">
+				<a href="index.html" class="nav-link">Home</a>
+				<a href="index.html#about" class="nav-link">About</a>
+				<a href="index.html#journey" class="nav-link">Evolution</a>
+				<a href="index.html#portfolio" class="nav-link">Portfolio</a>
+				<a href="ai-image-editor.html" class="nav-link active">AI Editor</a>
+				<a href="index.html#contact" class="nav-link">Contact</a>
+			</div>
+
+			<div class="nav-actions">
+				<a href="cv/cv.pdf" target="_blank" class="btn-secondary cv-download">
+					<i class="fas fa-download"></i>
+					<span>Download CV</span>
+				</a>
+				<a href="index.html#contact" class="btn-primary">Get In Touch</a>
+				<div class="hamburger" id="hamburger">
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+			</div>
+		</div>
+	</nav>
+
+	<!-- AI Image Editor Main Container -->
+	<main class="ai-editor-container">
+		<!-- Header Section -->
+		<section class="editor-header">
+			<div class="header-content">
+				<h1 class="editor-title">
+					<i class="fas fa-magic"></i>
+					<span class="title-text">AiLex Image Editor</span>
+				</h1>
+				<!-- Inline Header Notification -->
+				<div class="header-notification" id="headerNotification" style="display: none;">
+					<i class="notification-icon"></i>
+					<span class="notification-text"></span>
+				</div>
+			</div>
+		</section>
+
+		<!-- Main Editor Layout -->
+		<section class="editor-workspace">
+			<!-- Left Panel - Generation Controls -->
+			<aside class="left-panel">
+				<div class="panel-card">
+					<div class="panel-header">
+						<h3><i class="fas fa-robot"></i> AI Generation</h3>
+					</div>
+					<div class="panel-content">
+						<!-- API Key Section -->
+						<div class="api-key-section" id="apiKeySection">
+							<!-- Condensed View: Shown when API key is valid -->
+							<div class="api-key-condensed" id="apiKeyCondensed" style="display: none;">
+								<div class="api-key-header-minimal">
+									<label>Gemini API Key</label>
+									<div class="api-key-status-group">
+										<div class="api-status-minimal">
+											<div class="status-indicator online"></div>
+											<span class="status-text-minimal">Valid</span>
+										</div>
+										<button type="button" class="btn-edit-minimal" id="editApiKeyBtn" title="Edit API key">
+											<i class="fas fa-edit"></i>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<!-- Expanded View: Shown when API key is not configured or being edited -->
+							<div class="api-key-expanded" id="apiKeyExpanded" style="display: none;">
+								<div class="label-with-status">
+									<label for="apiKeyInput">Gemini API Key</label>
+									<div class="api-status" id="apiStatus">
+										<div class="status-indicator offline" id="statusIndicator"></div>
+										<span class="status-text" id="statusText">API Key Required</span>
+										<div class="api-inline-notification" id="apiInlineNotification" style="display: none;">
+											<i class="fas fa-check-circle"></i>
+											<span>Verified</span>
+										</div>
+									</div>
+								</div>
+								<div class="input-group">
+									<input type="password" id="apiKeyInput" placeholder="Enter your Gemini API key" class="api-key-input">
+									<button type="button" id="saveApiKey" class="btn-icon" title="Save API Key">
+										<i class="fas fa-save"></i>
+									</button>
+									<button type="button" id="testApiKey" class="btn-icon" title="Test API Key">
+										<i class="fas fa-check"></i>
+									</button>
+								</div>
+								<small class="help-text">Your API key is stored locally and never shared</small>
+							</div>
+						</div>
+
+						<!-- Prompt Section -->
+						<div class="prompt-section">
+							<label for="promptInput">Image Prompt</label>
+
+							<!-- Integrated Prompt Container -->
+							<div class="prompt-container">
+								<textarea id="promptInput" placeholder="Describe the image you want to create..." class="prompt-input" rows="3"></textarea>
+
+								<!-- Integrated Footer with Buttons - Double Row Layout -->
+								<div class="prompt-footer">
+									<!-- Row 1: Aspect Ratio Only -->
+									<div class="prompt-footer-row prompt-footer-aspect">
+										<div class="aspect-ratio-footer-group">
+											<button type="button" class="aspect-ratio-footer-btn active" data-ratio="auto" title="Auto (use source image ratio)">
+												<span>Auto</span>
+											</button>
+											<button type="button" class="aspect-ratio-footer-btn" data-ratio="1:1" title="Square (1:1)">
+												<span>1:1</span>
+											</button>
+											<button type="button" class="aspect-ratio-footer-btn" data-ratio="16:9" title="Widescreen (16:9)">
+												<span>16:9</span>
+											</button>
+											<button type="button" class="aspect-ratio-footer-btn" data-ratio="9:16" title="Portrait/Mobile (9:16)">
+												<span>9:16</span>
+											</button>
+											<button type="button" class="aspect-ratio-footer-btn" data-ratio="4:3" title="Standard (4:3)">
+												<span>4:3</span>
+											</button>
+											<button type="button" class="aspect-ratio-footer-btn" data-ratio="3:4" title="Portrait (3:4)">
+												<span>3:4</span>
+											</button>
+											<button type="button" class="aspect-ratio-footer-btn" data-ratio="3:2" title="Photo Landscape (3:2)">
+												<span>3:2</span>
+											</button>
+											<button type="button" class="aspect-ratio-footer-btn" data-ratio="2:3" title="Photo Portrait (2:3)">
+												<span>2:3</span>
+											</button>
+											<button type="button" class="aspect-ratio-footer-btn" data-ratio="5:4" title="Large Format (5:4)">
+												<span>5:4</span>
+											</button>
+											<button type="button" class="aspect-ratio-footer-btn" data-ratio="4:5" title="Instagram Portrait (4:5)">
+												<span>4:5</span>
+											</button>
+											<button type="button" class="aspect-ratio-footer-btn" data-ratio="21:9" title="Ultra-wide/Cinema (21:9)">
+												<span>21:9</span>
+											</button>
+										</div>
+									</div>
+
+									<!-- Row 2: Resolution + Action Buttons -->
+									<div class="prompt-footer-row prompt-footer-actions">
+										<div class="resolution-footer-group">
+											<button type="button" class="resolution-footer-btn" data-resolution="1K" title="1K Resolution (~1024px)">
+												<span>1K</span>
+											</button>
+											<button type="button" class="resolution-footer-btn active" data-resolution="2K" title="2K Resolution (~2048px) - Recommended">
+												<span>2K</span>
+											</button>
+											<button type="button" class="resolution-footer-btn" data-resolution="4K" title="4K Resolution (~4096px) - Highest Quality">
+												<span>4K</span>
+											</button>
+										</div>
+										<button type="button" id="enhancePrompt" class="btn-footer btn-secondary" disabled title="Use AI to improve your prompt">
+											<i class="fas fa-wand-magic-sparkles"></i>
+											<span>Enhance Prompt</span>
+										</button>
+
+										<button type="button" id="generateImage" class="btn-footer btn-primary" disabled>
+											<i class="fas fa-magic"></i>
+											<span>Generate Image</span>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<!-- Style Presets -->
+							<div class="style-presets-section" id="generationStylePresets">
+								<span class="presets-label">Style Presets:</span>
+								<div class="style-presets-grid">
+									<button type="button" class="style-preset-btn" data-preset="photorealistic" title="Photorealistic - 8K professional photography">
+										<i class='bx bxs-camera'></i>
+										<span>Photo</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="anime" title="Anime - Vibrant cel-shaded illustration">
+										<i class='bx bxs-palette'></i>
+										<span>Anime</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="oilPainting" title="Oil Painting - Classical art with rich textures">
+										<i class='bx bxs-brush'></i>
+										<span>Oil Paint</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="cinematic" title="Cinematic - Dramatic Hollywood-quality composition">
+										<i class='bx bxs-movie'></i>
+										<span>Cinematic</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="fantasy" title="Fantasy - Magical concept art">
+										<i class='bx bxs-magic-wand'></i>
+										<span>Fantasy</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="minimalist" title="Minimalist - Clean modern design">
+										<i class='bx bxs-cube'></i>
+										<span>Minimal</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="cyberpunk" title="Cyberpunk - Futuristic neon aesthetic">
+										<i class='bx bxs-chip'></i>
+										<span>Cyber</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="landscape" title="Landscape - National Geographic quality">
+										<i class='bx bxs-landscape'></i>
+										<span>Landscape</span>
+									</button>
+								</div>
+							</div>
+
+							<!-- Generation Status -->
+							<div class="generation-status" id="generationStatus"></div>
+						</div>
+					</div>
+			</div>
+
+			<!-- Image Upload Section -->
+			<div class="panel-card compact-panel">
+				<div class="panel-header">
+					<h3><i class="fas fa-upload"></i> Upload Image</h3>
+				</div>
+				<div class="panel-content">
+					<div class="upload-compact" id="uploadZone">
+						<button type="button" id="selectFileBtn" class="upload-btn">
+							<i class="fas fa-cloud-upload-alt"></i>
+							<span>Choose or Drop Image</span>
+						</button>
+						<input type="file" id="imageFileInput" accept="image/png,image/jpeg,image/webp,image/gif" style="display: none;">
+					</div>
+				</div>
+			</div>
+
+			<!-- Transfers Section with Tabs -->
+			<div class="panel-card compact-panel" id="transfersPanel">
+				<div class="panel-header">
+					<h3><i class="fas fa-exchange-alt"></i> Transfers</h3>
+				</div>
+				<div class="panel-content">
+					<!-- Tab Navigation -->
+					<div class="tab-navigation">
+						<button type="button" class="tab-btn active" data-tab="object-transfer">
+							<i class="fas fa-exchange-alt"></i>
+							<span>Object Transfer</span>
+						</button>
+						<button type="button" class="tab-btn" data-tab="style-transfer">
+							<i class="fas fa-palette"></i>
+							<span>Style Transfer</span>
+						</button>
+					</div>
+
+					<!-- Tab Contents -->
+					<div class="tab-contents">
+						<!-- Object Transfer Tab Content -->
+						<div class="tab-content active" id="object-transfer-tab">
+							<!-- Upload Source Image Button -->
+							<div class="upload-compact">
+								<button type="button" id="uploadSourceBtn" class="upload-btn">
+									<i class="fas fa-upload"></i>
+									<span>Upload Source Image</span>
+								</button>
+								<input type="file" id="sourceImageInput" accept="image/png,image/jpeg,image/webp" style="display: none;">
+							</div>
+
+							<!-- Source Image Preview (Hidden by default) -->
+							<div id="sourcePreview" class="source-preview" style="display: none;">
+								<div class="preview-header">
+									<span class="preview-label">Source Image:</span>
+									<button type="button" id="removeSourceBtn" class="btn-remove-preview" title="Remove source image">
+										<i class="fas fa-times"></i>
+									</button>
+								</div>
+								<div class="preview-image-container">
+									<img id="sourcePreviewImg" alt="Source image preview" class="preview-image">
+								</div>
+							</div>
+
+							<!-- Transfer Description Section -->
+							<div class="prompt-section" id="transferDescriptionSection" style="display: none;">
+								<label for="transferDescriptionInput">Transfer Description</label>
+
+								<!-- Integrated Prompt Container -->
+								<div class="prompt-container">
+									<textarea
+										id="transferDescriptionInput"
+										placeholder="Describe what to transfer from the source image (e.g., 'blue cotton t-shirt', 'wooden table', 'person wearing red jacket')"
+										class="prompt-input"
+										rows="4"
+										disabled></textarea>
+
+									<!-- Integrated Footer with Buttons -->
+									<div class="prompt-footer">
+										<button type="button" id="analyzeImageBtn" class="btn-footer btn-secondary" disabled title="Use AI to analyze the source image">
+											<i class="fas fa-search"></i>
+											<span>Analyze Image</span>
+										</button>
+
+										<button type="button" id="transferObjectBtn" class="btn-footer btn-primary" disabled>
+											<i class="fas fa-exchange-alt"></i>
+											<span>Transfer</span>
+										</button>
+									</div>
+								</div>
+
+								<!-- Transfer Status -->
+								<div class="generation-status" id="transferStatus"></div>
+							</div>
+						</div>
+
+						<!-- Style Transfer Tab Content -->
+						<div class="tab-content" id="style-transfer-tab">
+							<!-- Upload Style Image Button -->
+							<div class="upload-compact">
+								<button type="button" id="uploadStyleBtn" class="upload-btn">
+									<i class="fas fa-upload"></i>
+									<span>Upload Style Image</span>
+								</button>
+								<input type="file" id="styleImageInput" accept="image/png,image/jpeg,image/webp" style="display: none;">
+							</div>
+
+							<!-- Style Image Preview (Hidden by default) -->
+							<div id="stylePreview" class="source-preview" style="display: none;">
+								<div class="preview-header">
+									<span class="preview-label">Style Reference:</span>
+									<button type="button" id="removeStyleBtn" class="btn-remove-preview" title="Remove style image">
+										<i class="fas fa-times"></i>
+									</button>
+								</div>
+								<div class="preview-image-container">
+									<img id="stylePreviewImg" alt="Style image preview" class="preview-image">
+								</div>
+							</div>
+
+							<!-- Style Description Section -->
+							<div class="prompt-section" id="styleDescriptionSection" style="display: none;">
+								<label for="styleDescriptionInput">Style Description</label>
+
+								<!-- Integrated Prompt Container -->
+								<div class="prompt-container">
+									<textarea
+										id="styleDescriptionInput"
+										placeholder="Describe the artistic style (e.g., 'Van Gogh's swirling brushstrokes with vibrant blues and yellows', 'Picasso's cubist geometric shapes')"
+										class="prompt-input"
+										rows="4"
+										disabled></textarea>
+
+									<!-- Integrated Footer with Buttons -->
+									<div class="prompt-footer">
+										<button type="button" id="analyzeStyleBtn" class="btn-footer btn-secondary" disabled title="Use AI to analyze the artistic style">
+											<i class="fas fa-search"></i>
+											<span>Analyze Style</span>
+										</button>
+
+										<button type="button" id="transferStyleBtn" class="btn-footer btn-primary" disabled>
+											<i class="fas fa-palette"></i>
+											<span>Transfer Style</span>
+										</button>
+									</div>
+								</div>
+
+								<!-- Target Element Input (Optional) -->
+								<div class="input-group" style="margin-top: 0.75rem;">
+									<label for="targetElementInput" style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 0.25rem; display: block;">
+										<i class="fas fa-crosshairs" style="margin-right: 0.25rem;"></i>
+										Target Element (Optional)
+									</label>
+									<input
+										type="text"
+										id="targetElementInput"
+										placeholder="e.g., 'the person', 'the background', 'the car' - leave empty to style entire image"
+										class="text-input"
+										style="width: 100%; padding: 0.5rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px; color: white; font-size: 0.85rem;">
+								</div>
+
+								<!-- Style Transfer Status -->
+								<div class="generation-status" id="styleTransferStatus"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Edit Current Image Section -->
+				<div class="panel-card" id="editImagePanel">
+					<div class="panel-header">
+						<h3><i class="fas fa-edit"></i> Edit Current Image</h3>
+					</div>
+					<div class="panel-content">
+						<div class="prompt-section">
+							<label for="editPromptInput">Edit Instructions</label>
+
+							<!-- Integrated Prompt Container -->
+							<div class="prompt-container">
+								<textarea id="editPromptInput" placeholder="Describe what you want to change in the current image..." class="prompt-input" rows="3"></textarea>
+
+								<!-- Integrated Footer with Buttons -->
+								<div class="prompt-footer">
+									<button type="button" id="analyzeCanvasBtn" class="btn-footer btn-secondary" disabled title="Analyze the current canvas image to help write better prompts">
+										<i class="fas fa-search"></i>
+										<span>Analyze Canvas</span>
+									</button>
+
+									<button type="button" id="extractEditTextBtn" class="btn-footer btn-secondary" disabled title="Extract text from the current image to edit">
+										<i class="fas fa-font"></i>
+										<span>Text Edit</span>
+									</button>
+
+									<button type="button" id="enhanceEditPrompt" class="btn-footer btn-secondary" disabled title="Use AI to improve your edit prompt">
+										<i class="fas fa-wand-magic-sparkles"></i>
+										<span>Enhance Prompt</span>
+									</button>
+
+									<button type="button" id="applyEdit" class="btn-footer btn-primary" disabled>
+										<i class="fas fa-check"></i>
+										<span>Apply</span>
+									</button>
+								</div>
+
+								<!-- Inline Text Extract Panel inside prompt container -->
+								<div id="textExtractModal" class="text-extract-modal inline" style="display: none;">
+										<div class="modal-body">
+											<div class="modal-label" aria-hidden="true">
+												<span class="dot"></span>
+												<span class="label-text">Detected</span>
+											</div>
+											<div class="chip-list" id="textExtractList">
+												<!-- Chips will be populated by JavaScript -->
+											</div>
+											<button type="button" id="textExtractCloseBtn" class="btn-icon" title="Close">
+												<i class='bx bx-x' aria-hidden="true"></i>
+												<span class="sr-only">Close</span>
+											</button>
+										</div>
+									</div>
+							</div>
+
+							<!-- Edit Style Presets -->
+							<div class="style-presets-section" id="editStylePresets">
+								<span class="presets-label">Edit Modes:</span>
+								<div class="style-presets-grid">
+									<button type="button" class="style-preset-btn" data-preset="enhance" title="Enhance - Improve quality and details">
+										<i class='bx bxs-star'></i>
+										<span>Enhance</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="vibrant" title="Vibrant - Boost colors and saturation">
+										<i class='bx bxs-color-fill'></i>
+										<span>Vibrant</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="moody" title="Moody - Dramatic atmospheric lighting">
+										<i class='bx bxs-moon'></i>
+										<span>Moody</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="bright" title="Bright - Increase exposure and luminosity">
+										<i class='bx bxs-sun'></i>
+										<span>Bright</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="cinematicEdit" title="Cinematic - Film-quality color grading">
+										<i class='bx bxs-film'></i>
+										<span>Cinematic</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="portrait" title="Portrait - Professional retouching">
+										<i class='bx bxs-user-circle'></i>
+										<span>Portrait</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="artistic" title="Artistic - Creative painterly effect">
+										<i class='bx bxs-brush-alt'></i>
+										<span>Artistic</span>
+									</button>
+									<button type="button" class="style-preset-btn" data-preset="dramatic" title="Dramatic - High contrast bold impact">
+										<i class='bx bxs-bolt'></i>
+										<span>Dramatic</span>
+									</button>
+								</div>
+							</div>
+
+							<!-- Edit Status -->
+							<div class="generation-status" id="editStatus"></div>
+						</div>
+					</div>
+				</div>
+			</aside>
+
+			<!-- Center Panel - Canvas Area -->
+			<main class="center-panel">
+				<div class="canvas-container">
+					<div class="canvas-header">
+						<h3><i class="fas fa-image"></i> Canvas</h3>
+						<div class="canvas-controls">
+							<!-- Save to Gallery Button (only appears after style transfer) -->
+							<button type="button" id="saveToGalleryBtn" class="btn-save-gallery" style="display: none;" data-tooltip="Save to Gallery" data-tooltip-position="bottom">
+								<i class="fas fa-save"></i>
+								<span>Save to Gallery</span>
+							</button>
+
+							<button type="button" id="zoomIn" class="btn-icon" data-tooltip="Zoom In" data-tooltip-position="bottom">
+								<i class="fas fa-search-plus"></i>
+							</button>
+							<button type="button" id="zoomOut" class="btn-icon" data-tooltip="Zoom Out" data-tooltip-position="bottom">
+								<i class="fas fa-search-minus"></i>
+							</button>
+							<button type="button" id="fitToScreen" class="btn-icon" title="Fit to Screen">
+								<i class="fas fa-expand-arrows-alt"></i>
+							</button>
+							<button type="button" id="resetView" class="btn-icon" title="Reset View">
+								<i class="fas fa-undo"></i>
+							</button>
+						</div>
+					</div>
+					
+					<!-- Konva Canvas Container -->
+					<div class="konva-container" id="konvaContainer">
+						<div class="canvas-placeholder" id="canvasPlaceholder">
+							<div class="placeholder-content">
+								<i class="fas fa-image placeholder-icon"></i>
+								<h4>No Image Loaded</h4>
+								<p>Generate an image with AI or upload one to start editing</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Canvas Status Bar -->
+					<div class="canvas-status-bar" id="canvasStatusBar">
+						<div class="status-item" id="statusResolution" title="Image Resolution">
+							<i class="fas fa-expand"></i>
+							<span class="status-label">Size:</span>
+							<span class="status-value" id="statusResolutionValue">--</span>
+						</div>
+						<div class="status-item" id="statusAspectRatio" title="Aspect Ratio">
+							<i class="fas fa-crop"></i>
+							<span class="status-label">Ratio:</span>
+							<span class="status-value" id="statusAspectRatioValue">--</span>
+						</div>
+						<div class="status-item" id="statusFormat" title="Image Format">
+							<i class="fas fa-file-image"></i>
+							<span class="status-label">Format:</span>
+							<span class="status-value" id="statusFormatValue">--</span>
+						</div>
+						<div class="status-item" id="statusFileSize" title="Estimated File Size">
+							<i class="fas fa-weight-hanging"></i>
+							<span class="status-label">Est. Size:</span>
+							<span class="status-value" id="statusFileSizeValue">--</span>
+						</div>
+						<div class="status-item" id="statusZoom" title="Current Zoom Level">
+							<i class="fas fa-search-plus"></i>
+							<span class="status-label">Zoom:</span>
+							<span class="status-value" id="statusZoomValue">100%</span>
+						</div>
+					</div>
+				</div>
+			</main>
+
+			<!-- Gallery Panel - Vertical Strip -->
+			<aside class="gallery-panel">
+				<div class="gallery-strip-vertical" id="galleryStrip">
+					<div class="gallery-header-vertical">
+						<h3><i class="fas fa-images"></i> Gallery</h3>
+					</div>
+					<div class="gallery-thumbnails-vertical" id="galleryThumbnails">
+						<!-- Thumbnails will be dynamically inserted here -->
+						<div class="gallery-empty">
+							<i class="fas fa-images"></i>
+							<p>No images yet</p>
+							<small>Generated images will appear here</small>
+						</div>
+					</div>
+				</div>
+			</aside>
+
+			<!-- Right Panel - Editing Tools -->
+			<aside class="right-panel">
+				<div class="panel-card">
+					<div class="panel-header">
+						<h3><i class="fas fa-tools"></i> Editing Tools</h3>
+					</div>
+					<div class="panel-content">
+						<!-- CATEGORY 1: Basic Transformations -->
+						<div class="tool-category" id="transformationsCategory">
+							<h4 class="category-title">
+								<i class="fas fa-sync-alt"></i>
+								Transformations
+							</h4>
+							<div class="tool-category-content">
+								<div class="tool-grid">
+									<!-- Rotation tools -->
+									<button type="button" id="rotateCW" class="tool-icon-btn" data-tooltip="Rotate 90° Clockwise" data-tooltip-position="bottom">
+										<i class="fas fa-redo"></i>
+									</button>
+									<button type="button" id="rotateCCW" class="tool-icon-btn" data-tooltip="Rotate 90° Counter-Clockwise" data-tooltip-position="bottom">
+										<i class="fas fa-undo"></i>
+									</button>
+									<button type="button" id="rotate180" class="tool-icon-btn" data-tooltip="Rotate 180°" data-tooltip-position="bottom">
+										<i class="fas fa-sync"></i>
+									</button>
+
+									<!-- Flip tools -->
+									<button type="button" id="flipHorizontal" class="tool-icon-btn" data-tooltip="Flip Horizontal" data-tooltip-position="bottom">
+										<i class="fas fa-arrows-alt-h"></i>
+									</button>
+									<button type="button" id="flipVertical" class="tool-icon-btn" data-tooltip="Flip Vertical" data-tooltip-position="bottom">
+										<i class="fas fa-arrows-alt-v"></i>
+									</button>
+
+									<!-- Resize tool -->
+									<button type="button" id="resizeTool" class="tool-icon-btn" data-tooltip="Resize Image" data-tooltip-position="bottom">
+										<i class="fas fa-expand-arrows-alt"></i>
+									</button>
+
+									<!-- Background Removal tool -->
+									<button type="button" id="removeBackground" class="tool-icon-btn" data-tooltip="Remove Background (AI)" data-tooltip-position="bottom">
+										<i class="fas fa-cut"></i>
+									</button>
+								</div>
+
+								<!-- Resize controls (hidden by default) -->
+								<div class="resize-controls" id="resizeControls" style="display: none;">
+									<div class="control-group">
+										<label for="resizeWidth">Width:</label>
+										<input type="number" id="resizeWidth" min="1" value="800">
+									</div>
+									<div class="control-group">
+										<label for="resizeHeight">Height:</label>
+										<input type="number" id="resizeHeight" min="1" value="600">
+									</div>
+									<div class="control-group">
+										<label>
+											<input type="checkbox" id="lockAspectRatio" checked>
+											Lock Aspect Ratio
+										</label>
+									</div>
+									<button type="button" id="applyResize" class="tool-btn primary">Apply</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- CROP TOOL -->
+						<div class="panel-card compact-panel" id="cropToolCategory">
+							<div class="panel-header">
+								<h3><i class="fas fa-crop"></i> Crop Tool</h3>
+							</div>
+							<div class="panel-content">
+								<!-- Crop Controls: [ Free ] [ 1:1 ] [ 16:9 ] [ 9:16 ]  |  W [ 1200 ] x H [ 800 ]  [ ✓ ] -->
+								<div class="control-group">
+									<div style="display: flex; gap: 0.5rem; align-items: center;">
+										<!-- Aspect Ratio Buttons -->
+										<button class="btn-secondary crop-ratio-btn" data-ratio="free" style="padding: 0.4rem 0.6rem; font-size: 0.75rem;">Free</button>
+										<button class="btn-secondary crop-ratio-btn" data-ratio="1" style="padding: 0.4rem 0.6rem; font-size: 0.75rem;">1:1</button>
+										<button class="btn-secondary crop-ratio-btn" data-ratio="1.7778" style="padding: 0.4rem 0.6rem; font-size: 0.75rem;">16:9</button>
+										<button class="btn-secondary crop-ratio-btn" data-ratio="0.5625" style="padding: 0.4rem 0.6rem; font-size: 0.75rem;">9:16</button>
+
+										<!-- Separator -->
+										<div style="width: 1px; height: 24px; background: rgba(255, 255, 255, 0.2); margin: 0 0.2rem;"></div>
+
+										<!-- Custom Dimensions: W [ ] x H [ ] [ ✓ ] -->
+										<span style="font-size: 0.75rem; color: var(--text-secondary);">W</span>
+										<input type="number" id="customCropWidth" placeholder="1200" min="1"
+											style="width: 60px; padding: 0.35rem 0.4rem; font-size: 0.75rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary); text-align: center;">
+
+										<span style="font-size: 0.75rem; color: var(--text-secondary);">x</span>
+
+										<span style="font-size: 0.75rem; color: var(--text-secondary);">H</span>
+										<input type="number" id="customCropHeight" placeholder="800" min="1"
+											style="width: 60px; padding: 0.35rem 0.4rem; font-size: 0.75rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-secondary); color: var(--text-primary); text-align: center;">
+
+										<button id="applyCustomCropBtn" class="btn-secondary" style="padding: 0.4rem 0.6rem; font-size: 0.75rem;" data-tooltip="Apply Custom Size" data-tooltip-position="bottom">
+											<i class="fas fa-check"></i>
+										</button>
+									</div>
+								</div>
+
+								<!-- Apply/Cancel Buttons (shown only when crop is active) -->
+								<div class="control-group" id="cropActions" style="display: none; margin-top: 0.5rem; gap: 0.4rem;">
+									<button id="applyCropBtn" class="btn-success" style="flex: 1; padding: 0.5rem; font-size: 0.85rem;">
+										<i class="fas fa-check"></i>
+										<span>Apply</span>
+									</button>
+									<button id="cancelCropBtn" class="btn-danger" style="flex: 1; padding: 0.5rem; font-size: 0.85rem;">
+										<i class="fas fa-times"></i>
+										<span>Cancel</span>
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- CATEGORY 2: Filters & Effects -->
+						<div class="tool-category" id="filtersCategory">
+							<h4 class="category-title collapsible collapsed" id="filtersCategoryTitle">
+								<i class="fas fa-magic"></i>
+								Filters & Effects
+								<span class="collapse-icon">▼</span>
+							</h4>
+
+							<div class="tool-category-content collapsible collapsed">
+								<!-- Filter Reset Button -->
+								<button type="button" id="resetFilters" class="tool-btn secondary" style="margin-bottom: 0.6rem;">
+									<i class="fas fa-undo"></i>
+									<span>Reset All Filters</span>
+								</button>
+
+								<div class="filter-list" id="filterList">
+								<!-- Brightness Filter -->
+								<div class="filter-control">
+									<label class="filter-label">
+										<i class="fas fa-sun"></i>
+										Brightness
+									</label>
+									<div class="filter-slider-group">
+										<input type="range" id="filterBrightness" class="filter-slider" min="0" max="2" step="0.1" value="1">
+										<span class="filter-value" id="filterBrightnessValue">100%</span>
+									</div>
+								</div>
+
+								<!-- Contrast Filter -->
+								<div class="filter-control">
+									<label class="filter-label">
+										<i class="fas fa-adjust"></i>
+										Contrast
+									</label>
+									<div class="filter-slider-group">
+										<input type="range" id="filterContrast" class="filter-slider" min="-100" max="100" step="1" value="0">
+										<span class="filter-value" id="filterContrastValue">0</span>
+									</div>
+								</div>
+
+								<!-- Blur Filter -->
+								<div class="filter-control">
+									<label class="filter-label">
+										<i class="fas fa-circle"></i>
+										Blur
+									</label>
+									<div class="filter-slider-group">
+										<input type="range" id="filterBlur" class="filter-slider" min="0" max="40" step="1" value="0">
+										<span class="filter-value" id="filterBlurValue">0</span>
+									</div>
+								</div>
+
+								<!-- Saturation (HSL) Filter -->
+								<div class="filter-control">
+									<label class="filter-label">
+										<i class="fas fa-palette"></i>
+										Saturation
+									</label>
+									<div class="filter-slider-group">
+										<input type="range" id="filterSaturation" class="filter-slider" min="-2" max="2" step="0.1" value="0">
+										<span class="filter-value" id="filterSaturationValue">0</span>
+									</div>
+								</div>
+
+								<!-- Hue (HSL) Filter -->
+								<div class="filter-control">
+									<label class="filter-label">
+										<i class="fas fa-tint"></i>
+										Hue
+									</label>
+									<div class="filter-slider-group">
+										<input type="range" id="filterHue" class="filter-slider" min="-180" max="180" step="1" value="0">
+										<span class="filter-value" id="filterHueValue">0°</span>
+									</div>
+								</div>
+
+								<!-- Luminance (HSL) Filter -->
+								<div class="filter-control">
+									<label class="filter-label">
+										<i class="fas fa-lightbulb"></i>
+										Luminance
+									</label>
+									<div class="filter-slider-group">
+										<input type="range" id="filterLuminance" class="filter-slider" min="-2" max="2" step="0.1" value="0">
+										<span class="filter-value" id="filterLuminanceValue">0</span>
+									</div>
+								</div>
+
+								<!-- Pixelate Filter -->
+								<div class="filter-control">
+									<label class="filter-label">
+										<i class="fas fa-th"></i>
+										Pixelate
+									</label>
+									<div class="filter-slider-group">
+										<input type="range" id="filterPixelate" class="filter-slider" min="1" max="50" step="1" value="1">
+										<span class="filter-value" id="filterPixelateValue">1</span>
+									</div>
+								</div>
+
+								<!-- Noise Filter -->
+								<div class="filter-control">
+									<label class="filter-label">
+										<i class="fas fa-random"></i>
+										Noise
+									</label>
+									<div class="filter-slider-group">
+										<input type="range" id="filterNoise" class="filter-slider" min="0" max="1" step="0.01" value="0">
+										<span class="filter-value" id="filterNoiseValue">0</span>
+									</div>
+								</div>
+
+								<!-- Toggle Filters -->
+								<div class="filter-toggles">
+									<button type="button" class="filter-toggle-btn" id="toggleGrayscale" data-tooltip="Toggle Grayscale" data-tooltip-position="left">
+										<i class="fas fa-circle"></i>
+										<span>Grayscale</span>
+									</button>
+									<button type="button" class="filter-toggle-btn" id="toggleSepia" data-tooltip="Toggle Sepia" data-tooltip-position="left">
+										<i class="fas fa-image"></i>
+										<span>Sepia</span>
+									</button>
+									<button type="button" class="filter-toggle-btn" id="toggleInvert" data-tooltip="Toggle Invert" data-tooltip-position="left">
+										<i class="fas fa-adjust"></i>
+										<span>Invert</span>
+									</button>
+									<button type="button" class="filter-toggle-btn" id="toggleEmboss" data-tooltip="Toggle Emboss" data-tooltip-position="left">
+										<i class="fas fa-cube"></i>
+										<span>Emboss</span>
+									</button>
+									<button type="button" class="filter-toggle-btn" id="togglePosterize" data-tooltip="Toggle Posterize" data-tooltip-position="left">
+										<i class="fas fa-layer-group"></i>
+										<span>Posterize</span>
+									</button>
+									<button type="button" class="filter-toggle-btn" id="toggleSolarize" data-tooltip="Toggle Solarize" data-tooltip-position="left">
+										<i class="fas fa-sun"></i>
+										<span>Solarize</span>
+									</button>
+									<button type="button" class="filter-toggle-btn" id="toggleEnhance" data-tooltip="Toggle Enhance" data-tooltip-position="left">
+										<i class="fas fa-star"></i>
+										<span>Enhance</span>
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- CATEGORY 3: Drawing Tools -->
+					<div class="tool-category" id="drawingCategory">
+						<h4 class="category-title">
+							<i class="fas fa-pen"></i>
+							Drawing Tools
+						</h4>
+
+						<div class="tool-category-content">
+							<!-- Drawing Tool Buttons with Color Picker -->
+							<div class="tool-grid" id="drawingToolGrid">
+								<button type="button" id="toolBrush" class="tool-icon-btn drawing-tool" data-tool="brush" data-tooltip="Free Draw (Brush)" data-tooltip-position="bottom">
+									<i class="fas fa-paint-brush"></i>
+								</button>
+								<button type="button" id="toolHighlighter" class="tool-icon-btn drawing-tool" data-tool="highlighter" data-tooltip="Highlighter" data-tooltip-position="bottom">
+									<i class="fas fa-highlighter"></i>
+								</button>
+								<button type="button" id="toolText" class="tool-icon-btn drawing-tool" data-tool="text" data-tooltip="Text Overlay" data-tooltip-position="bottom">
+									<i class="fas fa-font"></i>
+								</button>
+								<button type="button" id="toolArrow" class="tool-icon-btn drawing-tool" data-tool="arrow" data-tooltip="Arrow" data-tooltip-position="bottom">
+									<i class="fas fa-arrow-right"></i>
+								</button>
+								<button type="button" id="toolRectangle" class="tool-icon-btn drawing-tool" data-tool="rectangle" data-tooltip="Rectangle" data-tooltip-position="bottom">
+									<i class="far fa-square"></i>
+								</button>
+								<button type="button" id="toolCircle" class="tool-icon-btn drawing-tool" data-tool="circle" data-tooltip="Circle/Ellipse" data-tooltip-position="bottom">
+									<i class="far fa-circle"></i>
+								</button>
+								<button type="button" id="toolStar" class="tool-icon-btn drawing-tool" data-tool="star" data-tooltip="Star" data-tooltip-position="bottom">
+									<i class="fas fa-star"></i>
+								</button>
+								<button type="button" id="toolPolygon" class="tool-icon-btn drawing-tool" data-tool="polygon" data-tooltip="Polygon" data-tooltip-position="bottom">
+									<i class="fas fa-draw-polygon"></i>
+								</button>
+								<!-- Action Buttons -->
+								<button type="button" id="undoDrawing" class="tool-icon-btn" data-tooltip="Undo Drawing (Ctrl+Z)" data-tooltip-position="bottom">
+									<i class="fas fa-undo"></i>
+								</button>
+								<button type="button" id="redoDrawing" class="tool-icon-btn" data-tooltip="Redo Drawing (Ctrl+Y)" data-tooltip-position="bottom">
+									<i class="fas fa-redo"></i>
+								</button>
+								<button type="button" id="clearDrawing" class="tool-icon-btn" data-tooltip="Clear All Drawings" data-tooltip-position="bottom">
+									<i class="fas fa-eraser"></i>
+								</button>
+								<!-- Color Picker Button -->
+								<label for="strokeColor" class="color-picker-btn" data-tooltip="Stroke Color" data-tooltip-position="bottom">
+									<input type="color" id="strokeColor" class="color-input-hidden" value="#00d4ff">
+									<div class="color-preview" id="strokeColorPreview" style="background-color: #00d4ff;"></div>
+								</label>
+							</div>
+
+							<!-- Drawing Controls -->
+							<div class="drawing-controls" id="drawingControls">
+								<!-- Stroke Width (Compact) -->
+								<div class="control-group-compact">
+									<label class="control-label-inline">
+										<i class="fas fa-ruler"></i>
+										<span>Stroke Width</span>
+									</label>
+									<div class="slider-group-inline">
+										<input type="range" id="strokeWidth" class="control-slider" min="1" max="50" step="1" value="3">
+										<span class="control-value" id="strokeWidthValue">3px</span>
+									</div>
+								</div>
+
+								<!-- Fill Color (for shapes) -->
+								<div class="control-group-compact" id="fillColorGroup" style="display: none;">
+									<label class="control-label-inline">
+										<i class="fas fa-fill-drip"></i>
+										<span>Fill Color</span>
+									</label>
+									<div class="color-picker-group-inline">
+										<input type="color" id="fillColor" class="color-input-compact" value="#00d4ff">
+										<span class="color-value-compact" id="fillColorValue">#00d4ff</span>
+										<label class="checkbox-label-compact">
+											<input type="checkbox" id="enableFill">
+											<span>Fill</span>
+										</label>
+									</div>
+								</div>
+
+								<!-- Font Size (for text tool) -->
+								<div class="control-group-compact" id="fontSizeGroup" style="display: none;">
+									<label class="control-label-inline">
+										<i class="fas fa-text-height"></i>
+										<span>Font Size</span>
+									</label>
+									<div class="slider-group-inline">
+										<input type="range" id="fontSize" class="control-slider" min="12" max="120" step="2" value="32">
+										<span class="control-value" id="fontSizeValue">32px</span>
+									</div>
+								</div>
+
+								<!-- Opacity (for highlighter) -->
+								<div class="control-group-compact" id="opacityGroup" style="display: none;">
+									<label class="control-label-inline">
+										<i class="fas fa-adjust"></i>
+										<span>Opacity</span>
+									</label>
+									<div class="slider-group-inline">
+										<input type="range" id="drawingOpacity" class="control-slider" min="0.1" max="1" step="0.1" value="0.5">
+										<span class="control-value" id="opacityValue">50%</span>
+									</div>
+								</div>
+
+
+							</div>
+						</div>
+					</div>
+
+					<!-- CATEGORY 4: Layer Management -->
+					<div class="tool-category" id="layersCategory">
+						<h4 class="category-title">
+							<i class="fas fa-layer-group"></i>
+							Layers
+						</h4>
+						<div class="tool-category-content">
+							<div id="layerPanel" class="layer-panel">
+								<!-- LayerPanelUI will render here -->
+							</div>
+						</div>
+					</div>
+
+					<!-- View & History Tools (Combined) -->
+						<div class="tool-section" id="viewHistoryTools">
+							<h4 class="tool-section-title">
+								<i class="fas fa-eye"></i>
+								View & History
+							</h4>
+							<div class="tool-grid-compact-tight">
+								<button type="button" id="fitToScreenTool" class="tool-icon-btn" data-tooltip="Fit to Screen" data-tooltip-position="bottom">
+									<i class="fas fa-expand-arrows-alt"></i>
+								</button>
+								<button type="button" id="resetTransform" class="tool-icon-btn" data-tooltip="Reset View" data-tooltip-position="bottom">
+									<i class="fas fa-undo"></i>
+								</button>
+								<button type="button" id="undoAction" class="tool-icon-btn" data-tooltip="Undo" data-tooltip-position="bottom">
+									<i class="fas fa-undo"></i>
+								</button>
+								<button type="button" id="redoAction" class="tool-icon-btn" data-tooltip="Redo" data-tooltip-position="bottom">
+									<i class="fas fa-redo"></i>
+								</button>
+							</div>
+						</div>
+
+						<!-- Export Tools -->
+						<div class="tool-section" id="exportTools">
+							<h4 class="tool-section-title">
+								<i class="fas fa-download"></i>
+								Export
+							</h4>
+
+							<!-- Quality and Format Controls (Single Row) -->
+							<div class="export-controls-row">
+								<!-- Quality Slider (70% width) -->
+								<div class="export-quality-group">
+									<input type="range" id="exportQuality" class="control-slider" min="0.1" max="1" step="0.1" value="0.9">
+									<span class="control-value" id="qualityValue">90%</span>
+								</div>
+
+								<!-- Format Dropdown (30% width) -->
+								<select id="exportFormat" class="export-format-select">
+									<option value="png">PNG</option>
+									<option value="jpeg">JPEG</option>
+									<option value="webp">WebP</option>
+								</select>
+							</div>
+
+							<!-- Download Button -->
+							<button type="button" id="downloadImage" class="tool-btn primary" style="margin-top: 0.3rem;">
+								<i class="fas fa-download"></i>
+								<span>Download</span>
+							</button>
+						</div>
+
+						<!-- Tools Placeholder for when no image is loaded -->
+						<div class="tools-placeholder" id="toolsPlaceholder">
+							<p>Load an image to access editing tools</p>
+						</div>
+					</div>
+				</div>
+			</aside>
+
+			<!-- Studio Panel (Below Canvas + Gallery) -->
+			<section class="studio-panel">
+			<div class="panel-card" id="linkedinStudioPanel">
+				<div class="panel-header">
+					<h3>
+						<i class='bx bxl-linkedin-square'></i> Studio
+					</h3>
+				</div>
+				<div class="panel-content" id="linkedinStudioContent">
+					<!-- Outer Tab Navigation: LinkedIn Pro Studio vs AD Studio -->
+					<div class="studio-tab-navigation" id="studioMainTabs">
+							<button type="button" class="studio-tab-btn active" data-studio-tab="linkedin-pro">
+								<i class='bx bxl-linkedin-square'></i> LinkedIn Pro Studio
+							</button>
+							<button type="button" class="studio-tab-btn" data-studio-tab="ad-studio">
+								<i class="fas fa-bullhorn"></i> AD Studio
+							</button>
+							<button type="button" class="studio-tab-btn" data-studio-tab="text-studio">
+								<i class="fas fa-font"></i> Text Studio
+							</button>
+						</div>
+
+					<!-- LinkedIn Pro Studio Tab Content -->
+					<div class="studio-tab-content active" id="linkedin-pro-tab">
+						<!-- Inner Tab Navigation (Quick Presets vs Virtual Studio vs Face & Body) -->
+						<div class="tab-navigation" id="linkedinStudioTabs">
+						<button type="button" class="tab-btn active" data-tab="presets">
+							<i class="fas fa-magic"></i> Quick Presets
+						</button>
+						<button type="button" class="tab-btn" data-tab="studio">
+							<i class="fas fa-sliders-h"></i> Virtual Studio
+						</button>
+						<button type="button" class="tab-btn" data-tab="facebody">
+							<i class='bx bx-face'></i> Face & Body
+						</button>
+					</div>
+
+					<!-- Contextual Analysis Toggle -->
+					<div class="studio-option" id="linkedinContextOption" style="margin: 8px 0 12px;">
+						<label for="linkedinContextToggle" style="cursor: pointer;">
+							<input type="checkbox" id="linkedinContextToggle" />
+							<span>Use contextual analysis</span>
+						</label>
+					</div>
+
+					<!-- Tab Content: Quick Presets -->
+					<div class="tab-content active" id="presets-tab">
+						<div class="presets-grid">
+							<!-- Preset cards with Boxicons -->
+							<button type="button" class="preset-card" data-preset="corporate">
+								<div class="preset-icon"><i class='bx bxs-briefcase'></i></div>
+								<div class="preset-name">Corporate Modern</div>
+								<div class="preset-description">Clean, minimalist, neutral tones</div>
+							</button>
+							<button type="button" class="preset-card" data-preset="creative">
+								<div class="preset-icon"><i class='bx bxs-palette'></i></div>
+								<div class="preset-name">Creative Professional</div>
+								<div class="preset-description">Artistic, warm, approachable</div>
+							</button>
+							<button type="button" class="preset-card" data-preset="tech">
+								<div class="preset-icon"><i class='bx bxs-chip'></i></div>
+								<div class="preset-name">Tech Executive</div>
+								<div class="preset-description">Sleek, modern, innovative</div>
+							</button>
+							<button type="button" class="preset-card" data-preset="thought-leader">
+								<div class="preset-icon"><i class='bx bxs-bulb'></i></div>
+								<div class="preset-name">Thought Leader</div>
+								<div class="preset-description">Approachable, confident, natural</div>
+							</button>
+							<button type="button" class="preset-card" data-preset="finance">
+								<div class="preset-icon"><i class='bx bxs-bank'></i></div>
+								<div class="preset-name">Finance/Legal</div>
+								<div class="preset-description">Authoritative, trustworthy, formal</div>
+							</button>
+							<button type="button" class="preset-card" data-preset="healthcare">
+								<div class="preset-icon"><i class='bx bxs-first-aid'></i></div>
+								<div class="preset-name">Healthcare</div>
+								<div class="preset-description">Compassionate, trustworthy, clean</div>
+							</button>
+						</div>
+
+						<!-- Attire Selection Section -->
+						<div class="attire-selection-section">
+							<div class="section-header">
+								<i class='bx bxs-t-shirt'></i>
+								<h4>Attire Selection</h4>
+								<span class="section-subtitle">Choose outfit style for your LinkedIn photo</span>
+							</div>
+
+							<!-- Outfit Mode Toggle -->
+							<div class="outfit-mode-toggle">
+								<button type="button" class="outfit-mode-btn active" data-outfit-mode="preset">
+									<i class='bx bx-grid-alt'></i>
+									<span>Preset Styles</span>
+								</button>
+								<button type="button" class="outfit-mode-btn" data-outfit-mode="reference">
+									<i class='bx bx-image-add'></i>
+									<span>Upload Reference</span>
+								</button>
+							</div>
+
+							<!-- Preset Attire Styles (Default View) -->
+							<div class="attire-content active" id="attire-preset-content">
+								<div class="attire-presets-grid">
+									<button type="button" class="attire-preset-card" data-attire="casual">
+										<div class="attire-icon"><i class='bx bxs-t-shirt'></i></div>
+										<div class="attire-name">Casual</div>
+										<div class="attire-description">T-shirt, relaxed fit</div>
+									</button>
+									<button type="button" class="attire-preset-card" data-attire="smart-casual">
+										<div class="attire-icon"><i class='bx bx-shopping-bag'></i></div>
+										<div class="attire-name">Smart Casual</div>
+										<div class="attire-description">Button-down, chinos</div>
+									</button>
+									<button type="button" class="attire-preset-card" data-attire="business-casual">
+										<div class="attire-icon"><i class='bx bx-briefcase-alt'></i></div>
+										<div class="attire-name">Business Casual</div>
+										<div class="attire-description">Dress shirt, slacks</div>
+									</button>
+									<button type="button" class="attire-preset-card" data-attire="business-professional">
+										<div class="attire-icon"><i class='bx bx-briefcase'></i></div>
+										<div class="attire-name">Business Pro</div>
+										<div class="attire-description">Suit and tie</div>
+									</button>
+									<button type="button" class="attire-preset-card" data-attire="executive">
+										<div class="attire-icon"><i class='bx bx-crown'></i></div>
+										<div class="attire-name">Executive</div>
+										<div class="attire-description">Premium suit, luxury</div>
+									</button>
+									<button type="button" class="attire-preset-card" data-attire="creative-professional">
+										<div class="attire-icon"><i class='bx bx-palette'></i></div>
+										<div class="attire-name">Creative Pro</div>
+										<div class="attire-description">Stylish blazer, modern</div>
+									</button>
+									<button type="button" class="attire-preset-card" data-attire="tech-startup">
+										<div class="attire-icon"><i class='bx bx-code-alt'></i></div>
+										<div class="attire-name">Tech Startup</div>
+										<div class="attire-description">Hoodie, casual</div>
+									</button>
+									<button type="button" class="attire-preset-card" data-attire="academic">
+										<div class="attire-icon"><i class='bx bx-book'></i></div>
+										<div class="attire-name">Academic</div>
+										<div class="attire-description">Blazer, sweater</div>
+									</button>
+									<button type="button" class="attire-preset-card" data-attire="formal-evening">
+										<div class="attire-icon"><i class='bx bx-diamond'></i></div>
+										<div class="attire-name">Formal Evening</div>
+										<div class="attire-description">Tuxedo, black tie</div>
+									</button>
+									<button type="button" class="attire-preset-card" data-attire="medical-professional">
+										<div class="attire-icon"><i class='bx bx-plus-medical'></i></div>
+										<div class="attire-name">Medical</div>
+										<div class="attire-description">White coat, scrubs</div>
+									</button>
+									<button type="button" class="attire-preset-card" data-attire="uniform-professional">
+										<div class="attire-icon"><i class='bx bx-id-card'></i></div>
+										<div class="attire-name">Industry Uniform</div>
+										<div class="attire-description">Professional uniform</div>
+									</button>
+									<button type="button" class="attire-preset-card" data-attire="minimalist-modern">
+										<div class="attire-icon"><i class='bx bx-minus-circle'></i></div>
+										<div class="attire-name">Minimalist</div>
+										<div class="attire-description">Clean, monochrome</div>
+									</button>
+								</div>
+							</div>
+
+							<!-- Reference Outfit Upload (Hidden by Default) -->
+							<div class="attire-content" id="attire-reference-content">
+								<div class="reference-upload-area">
+									<div class="upload-instructions">
+										<i class='bx bx-cloud-upload'></i>
+										<p>Upload a reference outfit image</p>
+										<span>We'll analyze the outfit and apply it to your LinkedIn photo</span>
+									</div>
+									<input type="file" id="referenceOutfitInput" accept="image/*" style="display: none;">
+									<button type="button" id="uploadReferenceBtn" class="btn-secondary">
+										<i class='bx bx-upload'></i>
+										<span>Choose Outfit Image</span>
+									</button>
+
+									<!-- Reference Outfit Preview (Hidden until uploaded) -->
+									<div class="reference-preview" id="referenceOutfitPreview" style="display: none;">
+										<div class="preview-header">
+											<span>Reference Outfit</span>
+											<button type="button" id="removeReferenceBtn" class="btn-icon">
+												<i class='bx bx-x'></i>
+											</button>
+										</div>
+										<img id="referenceOutfitImg" src="" alt="Reference outfit">
+										<div class="analysis-status" id="outfitAnalysisStatus">
+											<i class='bx bx-loader-alt bx-spin'></i>
+											<span>Analyzing outfit...</span>
+										</div>
+										<div class="outfit-description" id="outfitDescriptionDisplay" style="display: none;">
+											<strong>Detected Outfit:</strong>
+											<p id="outfitDescriptionText"></p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Selected Attire Display -->
+							<div class="selected-attire-display" id="selectedAttireDisplay" style="display: none;">
+								<div class="selected-attire-badge">
+									<i class='bx bx-check-circle'></i>
+									<span id="selectedAttireName">No attire selected</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Preset Actions -->
+						<div class="linkedin-actions">
+							<button type="button" id="analyzePortraitBtn" class="btn-secondary" disabled>
+								<i class="fas fa-search"></i>
+								<span>Analyze Portrait</span>
+							</button>
+							<button type="button" id="applyPresetTransform" class="btn-primary" disabled>
+								<i class="fas fa-magic"></i>
+								<span>Apply Transform</span>
+							</button>
+						</div>
+					</div>
+
+					<!-- Tab Content: Virtual Studio -->
+					<div class="tab-content" id="studio-tab">
+						<!-- Lighting Setup -->
+						<div class="control-section">
+							<div class="control-section-header">
+								<i class="fas fa-lightbulb"></i> Lighting Setup
+							</div>
+							<div class="control-group-compact">
+								<label class="control-label-inline">
+									<span>Direction</span>
+								</label>
+								<div class="slider-group-inline">
+									<input type="range" id="lightingDirection" class="control-slider"
+										min="0" max="360" step="15" value="45">
+									<span class="control-value" id="lightingDirectionValue">45°</span>
+								</div>
+							</div>
+							<div class="control-group-compact">
+								<label class="control-label-inline">
+									<span>Intensity</span>
+								</label>
+								<div class="slider-group-inline">
+									<input type="range" id="lightingIntensity" class="control-slider"
+										min="0.3" max="1.0" step="0.1" value="0.6">
+									<span class="control-value" id="lightingIntensityValue">Balanced</span>
+								</div>
+							</div>
+							<div class="control-group-compact">
+								<label class="control-label-inline">
+									<span>Temperature</span>
+								</label>
+								<div class="slider-group-inline">
+									<input type="range" id="colorTemperature" class="control-slider"
+										min="3000" max="7000" step="500" value="5500">
+									<span class="control-value" id="colorTemperatureValue">5500K</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Camera & Composition -->
+						<div class="control-section">
+							<div class="control-section-header">
+								<i class="fas fa-camera"></i> Camera & Composition
+							</div>
+							<div class="control-group-compact">
+								<label class="control-label-inline">
+									<span>Focal Length</span>
+								</label>
+								<div class="slider-group-inline">
+									<input type="range" id="focalLength" class="control-slider"
+										min="35" max="135" step="15" value="85">
+									<span class="control-value" id="focalLengthValue">85mm</span>
+								</div>
+							</div>
+							<div class="control-group-compact">
+								<label class="control-label-inline">
+									<span>Camera Angle</span>
+								</label>
+								<div class="slider-group-inline">
+									<input type="range" id="cameraAngle" class="control-slider"
+										min="-15" max="15" step="5" value="0">
+									<span class="control-value" id="cameraAngleValue">Eye Level</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Subject Enhancement -->
+						<div class="control-section">
+							<div class="control-section-header">
+								<i class="fas fa-smile"></i> Subject Enhancement
+							</div>
+							<div class="control-group-compact">
+								<label class="control-label-inline">
+									<span>Smile Intensity</span>
+								</label>
+								<div class="slider-group-inline">
+									<input type="range" id="smileIntensity" class="control-slider"
+										min="0" max="1.0" step="0.1" value="0.5">
+									<span class="control-value" id="smileIntensityValue">Warm</span>
+								</div>
+							</div>
+							<div class="control-group-compact">
+								<label class="control-label-inline">
+									<span>Gaze Direction</span>
+								</label>
+								<div class="slider-group-inline">
+									<select id="gazeDirection" class="control-select">
+										<option value="direct">Direct at Camera</option>
+										<option value="left">Slightly Left</option>
+										<option value="right">Slightly Right</option>
+										<option value="up">Slightly Up</option>
+									</select>
+								</div>
+							</div>
+							<div class="control-group-compact">
+								<label class="control-label-inline">
+									<span>Skin Retouching</span>
+								</label>
+								<div class="slider-group-inline">
+									<input type="range" id="skinRetouching" class="control-slider"
+										min="0" max="1.0" step="0.1" value="0.5">
+									<span class="control-value" id="skinRetouchingValue">Light</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Background Options -->
+						<div class="control-section">
+							<div class="control-section-header">
+								<i class="fas fa-image"></i> Background
+							</div>
+							<div class="control-group-compact">
+								<label class="control-label-inline">
+									<span>Style</span>
+								</label>
+								<div class="slider-group-inline">
+									<select id="backgroundStyle" class="control-select">
+										<option value="keep">Keep Original</option>
+										<option value="solid-gray">Solid - Neutral Gray</option>
+										<option value="solid-blue">Solid - Professional Blue</option>
+										<option value="solid-beige">Solid - Warm Beige</option>
+										<option value="gradient">Gradient - Modern</option>
+										<option value="blurred-office">Blurred Office</option>
+										<option value="blurred-bookshelf">Blurred Bookshelf</option>
+										<option value="blurred-natural">Blurred Natural</option>
+										<option value="studio-white">Studio - White</option>
+										<option value="studio-dark">Studio - Dark</option>
+									</select>
+								</div>
+							</div>
+							<div class="control-group-compact">
+								<label class="control-label-inline">
+									<span>Blur Intensity</span>
+								</label>
+								<div class="slider-group-inline">
+									<input type="range" id="backgroundBlur" class="control-slider"
+										min="0.3" max="1.0" step="0.1" value="0.6">
+									<span class="control-value" id="backgroundBlurValue">Medium</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Studio Actions -->
+						<div class="linkedin-actions">
+							<button type="button" id="resetStudioSettings" class="btn-secondary">
+								<i class="fas fa-undo"></i>
+								<span>Reset to Defaults</span>
+							</button>
+							<button type="button" id="applyStudioTransform" class="btn-primary" disabled>
+								<i class="fas fa-check"></i>
+								<span>Apply Transform</span>
+							</button>
+						</div>
+					</div>
+
+					<!-- Tab Content: Face & Body -->
+					<div class="tab-content" id="facebody-tab">
+						<!-- Quick Enhancement Presets -->
+						<div class="face-presets-section">
+							<div class="face-presets-grid">
+								<!-- Natural Enhancement Preset -->
+								<button type="button" class="face-preset-card" data-preset="natural">
+									<div class="preset-icon"><i class='bx bx-sparkles'></i></div>
+									<div class="preset-name">Natural Enhancement</div>
+									<div class="preset-description">Subtle, authentic improvements</div>
+								</button>
+
+								<!-- Professional Polish Preset (Recommended) -->
+								<button type="button" class="face-preset-card recommended" data-preset="professional">
+									<div class="preset-badge">Recommended</div>
+									<div class="preset-icon"><i class='bx bxs-briefcase'></i></div>
+									<div class="preset-name">Professional Polish</div>
+									<div class="preset-description">Polished, corporate-ready</div>
+								</button>
+
+								<!-- Dramatic Transformation Preset -->
+								<button type="button" class="face-preset-card" data-preset="dramatic">
+									<div class="preset-icon"><i class='bx bxs-star'></i></div>
+									<div class="preset-name">Dramatic Transform</div>
+									<div class="preset-description">Maximum enhancement</div>
+								</button>
+							</div>
+						</div>
+
+						<!-- Custom Enhancements (Collapsible Sections) -->
+						<div class="custom-enhancements-section">
+							<div class="section-header-small">
+								<i class='bx bx-slider'></i>
+								<span>Custom Enhancements</span>
+							</div>
+
+							<!-- Skin & Age Section -->
+							<div class="collapsible-section">
+								<button type="button" class="collapsible-header">
+									<i class='bx bx-droplet'></i>
+									<span>Skin & Age</span>
+									<i class='bx bx-chevron-down collapse-icon'></i>
+								</button>
+								<div class="collapsible-content">
+									<!-- Wrinkle Reduction -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Wrinkle Reduction</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Reduce visible wrinkles and fine lines"></i>
+										</label>
+										<div class="slider-group-inline">
+											<input type="range" id="wrinkleReduction" class="control-slider"
+												min="0" max="100" step="5" value="0">
+											<span class="control-value" id="wrinkleReductionValue">0%</span>
+										</div>
+									</div>
+
+									<!-- Skin Smoothing -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Skin Smoothing</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Smooth skin texture while preserving natural detail"></i>
+										</label>
+										<div class="slider-group-inline">
+											<input type="range" id="skinSmoothing" class="control-slider"
+												min="0" max="100" step="5" value="0">
+											<span class="control-value" id="skinSmoothingValue">0%</span>
+										</div>
+									</div>
+
+									<!-- Remove Blemishes -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Remove Blemishes</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Remove moles, blemishes, and skin imperfections"></i>
+										</label>
+										<div class="slider-group-inline">
+											<label class="toggle-switch">
+												<input type="checkbox" id="removeBlemishes">
+												<span class="toggle-slider"></span>
+											</label>
+											<span class="control-value" id="removeBlemishesValue">OFF</span>
+										</div>
+									</div>
+
+									<!-- Age Adjustment -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Age Adjustment</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Rejuvenate appearance by reducing age indicators"></i>
+										</label>
+										<div class="age-adjustment-buttons">
+											<button type="button" class="age-btn" data-age="-5">-5yr</button>
+											<button type="button" class="age-btn" data-age="-10">-10yr</button>
+											<button type="button" class="age-btn" data-age="-15">-15yr</button>
+											<button type="button" class="age-btn active" data-age="0">Reset</button>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Face Shape Section -->
+							<div class="collapsible-section">
+								<button type="button" class="collapsible-header">
+									<i class='bx bx-user'></i>
+									<span>Face Shape</span>
+									<i class='bx bx-chevron-down collapse-icon'></i>
+								</button>
+								<div class="collapsible-content">
+									<!-- Face Slimming -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Face Slimming</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Slim face for more defined jawline and cheekbones"></i>
+										</label>
+										<div class="slider-group-inline">
+											<input type="range" id="faceSlimming" class="control-slider"
+												min="0" max="100" step="5" value="0">
+											<span class="control-value" id="faceSlimmingValue">0%</span>
+										</div>
+									</div>
+
+									<!-- Nose Refinement -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Nose Refinement</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Refine nose shape for more balanced proportions"></i>
+										</label>
+										<div class="slider-group-inline">
+											<input type="range" id="noseRefinement" class="control-slider"
+												min="0" max="100" step="5" value="0">
+											<span class="control-value" id="noseRefinementValue">0%</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Eyes Section -->
+							<div class="collapsible-section">
+								<button type="button" class="collapsible-header">
+									<i class='bx bx-show'></i>
+									<span>Eyes</span>
+									<i class='bx bx-chevron-down collapse-icon'></i>
+								</button>
+								<div class="collapsible-content">
+									<!-- Eye Color -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Eye Color</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Change eye color"></i>
+										</label>
+										<div class="slider-group-inline">
+											<select id="eyeColor" class="control-select">
+												<option value="original">Keep Original</option>
+												<option value="blue">Blue</option>
+												<option value="green">Green</option>
+												<option value="brown">Brown</option>
+												<option value="hazel">Hazel</option>
+												<option value="gray">Gray</option>
+												<option value="amber">Amber</option>
+											</select>
+										</div>
+									</div>
+
+									<!-- Eye Shape -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Eye Shape</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Modify eye shape"></i>
+										</label>
+										<div class="slider-group-inline">
+											<select id="eyeShape" class="control-select">
+												<option value="original">Keep Original</option>
+												<option value="rounder">Rounder (more open)</option>
+												<option value="almond">Almond-shaped</option>
+												<option value="wider">Wider (more alert)</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Teeth Section -->
+							<div class="collapsible-section">
+								<button type="button" class="collapsible-header">
+									<i class='bx bx-smile'></i>
+									<span>Teeth</span>
+									<i class='bx bx-chevron-down collapse-icon'></i>
+								</button>
+								<div class="collapsible-content">
+									<!-- Teeth Whitening -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Teeth Whitening</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Brighten teeth to natural white"></i>
+										</label>
+										<div class="slider-group-inline">
+											<input type="range" id="teethWhitening" class="control-slider"
+												min="0" max="100" step="5" value="0">
+											<span class="control-value" id="teethWhiteningValue">0%</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Hair Section -->
+							<div class="collapsible-section">
+								<button type="button" class="collapsible-header">
+									<i class='bx bx-cut'></i>
+									<span>Hair</span>
+									<i class='bx bx-chevron-down collapse-icon'></i>
+								</button>
+								<div class="collapsible-content">
+									<!-- Hair Color -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Hair Color</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Change hair color"></i>
+										</label>
+										<div class="slider-group-inline">
+											<select id="hairColor" class="control-select">
+												<option value="original">Keep Original</option>
+												<option value="black">Black</option>
+												<option value="brown">Brown</option>
+												<option value="blonde">Blonde</option>
+												<option value="red">Red</option>
+												<option value="gray">Gray</option>
+												<option value="custom">Custom Color</option>
+											</select>
+										</div>
+									</div>
+
+									<!-- Custom Hair Color Picker (shown when Custom is selected) -->
+									<div class="control-group-compact" id="customHairColorGroup" style="display: none;">
+										<label class="control-label-inline">
+											<span>Custom Color</span>
+										</label>
+										<div class="slider-group-inline">
+											<input type="color" id="customHairColor" class="color-picker" value="#000000">
+											<span class="control-value" id="customHairColorValue">#000000</span>
+										</div>
+									</div>
+
+									<!-- Hair Length -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Hair Length</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Make hair shorter or longer"></i>
+										</label>
+										<div class="slider-group-inline">
+											<input type="range" id="hairLength" class="control-slider"
+												min="-50" max="50" step="5" value="0">
+											<span class="control-value" id="hairLengthValue">No Change</span>
+										</div>
+									</div>
+
+									<!-- Hair Volume -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Hair Volume</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Increase hair thickness and fullness"></i>
+										</label>
+										<div class="slider-group-inline">
+											<input type="range" id="hairVolume" class="control-slider"
+												min="0" max="100" step="5" value="0">
+											<span class="control-value" id="hairVolumeValue">0%</span>
+										</div>
+									</div>
+
+									<!-- Hair Style Reference -->
+									<div class="hair-reference-section">
+										<button type="button" class="upload-reference-btn" id="uploadHairReferenceBtn">
+											<i class='bx bx-image-add'></i>
+											<span>Upload Hair Style Reference</span>
+										</button>
+										<input type="file" id="hairReferenceInput" accept="image/*" style="display: none;">
+
+										<!-- Preview Area (shown after upload) -->
+										<div class="hair-reference-preview" id="hairReferencePreview" style="display: none;">
+											<img id="hairReferenceImage" alt="Hair style reference">
+											<button type="button" class="remove-reference-btn" id="removeHairReferenceBtn">
+												<i class='bx bx-x'></i>
+											</button>
+										</div>
+
+										<!-- Analysis Status -->
+										<div class="hair-analysis-status" id="hairAnalysisStatus" style="display: none;">
+											<i class='bx bx-loader-alt bx-spin'></i>
+											<span>Analyzing hair style...</span>
+										</div>
+
+										<!-- Detected Description (editable) -->
+										<div class="hair-description" id="hairDescriptionDisplay" style="display: none;">
+											<strong>Detected Hair Style:</strong>
+											<p id="hairDescriptionText" contenteditable="true"></p>
+											<small>Click to edit description</small>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Body Section (Optional) -->
+							<div class="collapsible-section">
+								<button type="button" class="collapsible-header">
+									<i class='bx bx-body'></i>
+									<span>Body (Optional)</span>
+									<i class='bx bx-chevron-down collapse-icon'></i>
+								</button>
+								<div class="collapsible-content">
+									<!-- Posture Correction -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Posture Correction</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Improve posture for more confident appearance"></i>
+										</label>
+										<div class="slider-group-inline">
+											<label class="toggle-switch">
+												<input type="checkbox" id="postureCorrection">
+												<span class="toggle-slider"></span>
+											</label>
+											<span class="control-value" id="postureCorrectionValue">OFF</span>
+										</div>
+									</div>
+
+									<!-- Shoulder Width -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Shoulder Width</span>
+											<i class='bx bx-info-circle tooltip-icon' data-tooltip="Adjust shoulder width for better proportions"></i>
+										</label>
+										<div class="slider-group-inline">
+											<input type="range" id="shoulderWidth" class="control-slider"
+												min="-20" max="20" step="5" value="0">
+											<span class="control-value" id="shoulderWidthValue">0%</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Enhancement Strength Control -->
+						<div class="enhancement-strength-section">
+							<div class="section-header-compact">
+								<i class='bx bx-slider-alt'></i>
+								<span>Enhancement Strength</span>
+								<i class='bx bx-info-circle tooltip-icon' data-tooltip="Control the intensity of all enhancements. 100% = full effect, 50% = subtle, 0% = no change"></i>
+							</div>
+							<div class="strength-control-group">
+								<div class="strength-slider-container">
+									<input type="range" id="enhancementStrength" class="strength-slider"
+										min="0" max="100" step="5" value="100">
+									<div class="strength-markers">
+										<span class="strength-marker" data-value="0">0%</span>
+										<span class="strength-marker" data-value="25">25%</span>
+										<span class="strength-marker" data-value="50">50%</span>
+										<span class="strength-marker" data-value="75">75%</span>
+										<span class="strength-marker" data-value="100">100%</span>
+									</div>
+								</div>
+								<div class="strength-value-display">
+									<span id="enhancementStrengthValue" class="strength-value-large">100%</span>
+									<span class="strength-label" id="enhancementStrengthLabel">Full Strength</span>
+								</div>
+							</div>
+							<div class="strength-warning" id="strengthWarning" style="display: none;">
+								<i class='bx bx-error-circle'></i>
+								<span>Very low strength may produce minimal changes</span>
+							</div>
+						</div>
+
+						<!-- Face & Body Actions -->
+						<div class="linkedin-actions">
+							<button type="button" id="undoFaceBodyEnhancement" class="btn-secondary" disabled>
+								<i class="fas fa-undo"></i>
+								<span>Undo Enhancement</span>
+							</button>
+							<button type="button" id="resetFaceBodyControls" class="btn-secondary">
+								<i class="fas fa-rotate-left"></i>
+								<span>Reset All</span>
+							</button>
+							<button type="button" id="applyFaceBodyEnhancements" class="btn-primary" disabled>
+								<i class="fas fa-magic"></i>
+								<span>Apply Enhancements</span>
+							</button>
+						</div>
+					</div>
+
+					<!-- Status Message -->
+					<div class="generation-status" id="linkedinStatus"></div>
+					</div>
+					<!-- End LinkedIn Pro Studio Tab Content -->
+
+					<!-- AD Studio Tab Content -->
+					<div class="studio-tab-content" id="ad-studio-tab">
+						<!-- Two-Column Layout: Creative Brief (Left) + Generation Canvas (Right) -->
+						<div class="ad-studio-container">
+
+							<!-- LEFT PANEL: The Creative Brief -->
+							<div class="ad-studio-inputs">
+								<div class="creative-brief-header">
+									<i class="fas fa-pencil-ruler"></i>
+									<h4>The Creative Brief</h4>
+								</div>
+
+								<!-- Ad Type Toggle -->
+								<div class="control-section">
+									<div class="control-section-header">
+										<i class="fas fa-toggle-on"></i> Ad Type
+									</div>
+									<div class="ad-type-toggle">
+										<button type="button" class="ad-type-btn active" data-ad-type="product">
+											<i class="fas fa-box"></i>
+											<span>Product Showcase</span>
+										</button>
+										<button type="button" class="ad-type-btn" data-ad-type="concept">
+											<i class="fas fa-lightbulb"></i>
+											<span>Concept/Service</span>
+										</button>
+									</div>
+								</div>
+
+								<!-- Core Components -->
+								<div class="control-section">
+									<div class="control-section-header">
+										<i class="fas fa-cog"></i> Core Components
+									</div>
+
+									<!-- Platform Selection -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Platform</span>
+										</label>
+										<div class="slider-group-inline">
+											<select id="adPlatform" class="control-select">
+												<option value="">Select Platform</option>
+												<option value="instagram">Instagram</option>
+												<option value="facebook">Facebook</option>
+												<option value="linkedin">LinkedIn</option>
+												<option value="twitter">Twitter/X</option>
+												<option value="tiktok">TikTok</option>
+												<option value="pinterest">Pinterest</option>
+											</select>
+										</div>
+									</div>
+
+									<!-- Format Selection (Dynamic based on platform) -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Format</span>
+										</label>
+										<div class="slider-group-inline">
+											<select id="adFormat" class="control-select" disabled>
+												<option value="">Select platform first</option>
+											</select>
+										</div>
+									</div>
+
+									<!-- Ad Copy/Headline -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Headline</span>
+										</label>
+										<div class="slider-group-inline">
+											<input type="text" id="adHeadline" class="control-input"
+												placeholder="e.g., Transform Your Morning Routine">
+										</div>
+									</div>
+
+									<!-- CTA (Call to Action) -->
+									<div class="control-group-compact">
+										<label class="control-label-inline">
+											<span>Call to Action</span>
+										</label>
+										<div class="slider-group-inline">
+											<input type="text" id="adCTA" class="control-input"
+												placeholder="e.g., Shop Now, Learn More">
+										</div>
+									</div>
+
+									<!-- Brand Name -->
+										<div class="control-group-compact">
+											<label class="control-label-inline">
+												<span>Brand Name</span>
+											</label>
+											<div class="slider-group-inline">
+												<input type="text" id="adBrandName" class="control-input"
+													placeholder="Your brand name">
+											</div>
+										</div>
+									</div>
+
+									<!-- Text Styling -->
+									<div class="control-section">
+										<div class="control-section-header">
+											<i class="fas fa-font"></i> Text Styling
+										</div>
+										<div class="control-group-compact">
+											<label class="control-label-inline">
+												<span>Text Style</span>
+											</label>
+											<div class="slider-group-inline">
+												<select id="adTextStyle" class="control-select">
+													<option value="modern-bold">Modern Bold Sans</option>
+													<option value="elegant-serif">Elegant Serif</option>
+													<option value="tech-sans">Tech Minimal Sans</option>
+													<option value="handwritten-playful">Handwritten Playful</option>
+													<option value="classic-serif">Classic Serif</option>
+												</select>
+											</div>
+										</div>
+
+										<div class="control-group-compact">
+											<label class="control-label-inline">
+												<span>Variations</span>
+											</label>
+											<div class="slider-group-inline">
+												<select id="variationCount" class="control-select">
+													<option value="2">2</option>
+													<option value="4" selected>4</option>
+													<option value="6">6</option>
+												</select>
+											</div>
+										</div>
+
+										<div class="control-group-compact">
+											<label class="control-label-inline" for="lockCopy">
+												<span>Lock Copy Across Variations</span>
+											</label>
+											<div class="slider-group-inline">
+												<input type="checkbox" id="lockCopy" />
+											</div>
+										</div>
+
+										<small class="help-text">Gemini will render headline/CTA directly into the image with the selected style.</small>
+									</div>
+
+								<!-- Asset Section (Dynamic based on Ad Type) -->
+								<div class="control-section">
+									<div class="control-section-header">
+										<i class="fas fa-image"></i> Assets
+									</div>
+
+									<!-- Product Image Upload (Shown when Ad Type = Product) -->
+									<div id="productAssetSection" class="asset-section">
+										<div class="product-upload-box">
+											<input type="file" id="productImageUpload" accept="image/*" style="display: none;">
+											<label for="productImageUpload" class="upload-label">
+												<i class="fas fa-cloud-upload-alt"></i>
+												<span>Upload Product Image</span>
+												<small>Click to browse or drag & drop</small>
+											</label>
+											<div id="productImagePreview" class="product-preview" style="display: none;">
+												<img id="productPreviewImg" src="" alt="Product preview">
+												<button type="button" class="remove-product-btn">
+													<i class="fas fa-times"></i>
+												</button>
+											</div>
+										</div>
+
+										<!-- Isolate Product Toggle -->
+										<div class="control-group-compact" style="margin-top: 0.75rem;">
+											<label class="control-label-inline">
+												<input type="checkbox" id="isolateProduct" class="control-checkbox">
+												<span>Isolate product from background</span>
+											</label>
+										</div>
+									</div>
+
+									<!-- Concept Text Area (Shown when Ad Type = Concept) -->
+									<div id="conceptAssetSection" class="asset-section" style="display: none;">
+										<textarea id="adConcept" class="control-textarea" rows="4"
+											placeholder="Describe your concept or service...&#10;&#10;Example: A peaceful yoga studio with natural lighting, plants, and minimalist decor. Focus on wellness and mindfulness."></textarea>
+									</div>
+								</div>
+
+								<!-- The Vibe -->
+								<div class="control-section">
+									<div class="control-section-header">
+										<i class="fas fa-palette"></i> The Vibe
+									</div>
+									<div class="vibe-tags">
+										<button type="button" class="vibe-tag" data-vibe="minimalist">Minimalist</button>
+										<button type="button" class="vibe-tag" data-vibe="bold">Bold & Energetic</button>
+										<button type="button" class="vibe-tag" data-vibe="elegant">Elegant & Luxury</button>
+										<button type="button" class="vibe-tag" data-vibe="playful">Playful & Fun</button>
+										<button type="button" class="vibe-tag" data-vibe="professional">Professional</button>
+										<button type="button" class="vibe-tag" data-vibe="vintage">Vintage & Retro</button>
+										<button type="button" class="vibe-tag" data-vibe="modern">Modern & Tech</button>
+										<button type="button" class="vibe-tag" data-vibe="natural">Natural & Organic</button>
+									</div>
+								</div>
+
+								<!-- Creative Prompt (Advanced) -->
+								<div class="control-section">
+									<div class="control-section-header">
+										<i class="fas fa-code"></i> Creative Prompt (Advanced)
+									</div>
+									<textarea id="adMasterPrompt" class="control-textarea" rows="6"
+										placeholder="Auto-generated prompt will appear here. You can edit it for fine-tuning."></textarea>
+								</div>
+
+							</div>
+							<!-- END LEFT PANEL -->
+
+							<!-- RIGHT PANEL: The Generation Canvas -->
+							<div class="ad-studio-results">
+								<div class="generation-canvas-header">
+									<i class="fas fa-th"></i>
+									<h4>Generation Canvas</h4>
+								</div>
+
+								<!-- Results Grid (2x2) -->
+								<div class="ad-results-grid" id="adResultsGrid">
+									<!-- Ad Cards will be dynamically inserted here -->
+									<div class="ad-card-placeholder">
+										<i class="fas fa-image"></i>
+										<p>Your ads will appear here</p>
+									</div>
+									<div class="ad-card-placeholder">
+										<i class="fas fa-image"></i>
+										<p>Generate to see results</p>
+									</div>
+									<div class="ad-card-placeholder">
+										<i class="fas fa-image"></i>
+										<p>4 variations per generation</p>
+									</div>
+									<div class="ad-card-placeholder">
+										<i class="fas fa-image"></i>
+										<p>Click Generate Ads below</p>
+									</div>
+								</div>
+
+								<!-- Main Action Buttons -->
+								<div class="ad-studio-actions">
+									<button type="button" id="generateAdsBtn" class="btn-primary" disabled>
+										<i class="fas fa-magic"></i>
+										<span>Generate Ads</span>
+									</button>
+									<button type="button" id="sendToCanvasBtn" class="btn-secondary" disabled>
+										<i class="fas fa-arrow-right"></i>
+										<span>Send to Main Canvas</span>
+									</button>
+								</div>
+
+								<!-- Status Message -->
+								<div class="generation-status" id="adStudioStatus"></div>
+							</div>
+							<!-- END RIGHT PANEL -->
+
+						</div>
+					</div>
+
+						<!-- Text Studio Tab Content -->
+						<div class="studio-tab-content" id="text-studio-tab">
+							<div class="text-studio-container">
+								<div class="control-section">
+									<div class="control-section-header"><i class="fas fa-search"></i> Text Analysis</div>
+									<div class="linkedin-actions">
+										<button type="button" id="analyzeTextBtn" class="btn-secondary" disabled>
+											<i class="fas fa-search"></i>
+											<span>Analyze Text in Image</span>
+										</button>
+									</div>
+									<div class="control-group-compact">
+										<label class="control-label-inline"><span>Detected Text</span></label>
+										<textarea id="detectedTextOutput" class="control-textarea" rows="6" placeholder="Detected text will appear here" readonly></textarea>
+									</div>
+								</div>
+
+								<div class="control-section">
+									<div class="control-section-header"><i class="fas fa-pencil-alt"></i> Edit Text</div>
+									<div class="control-group-compact">
+										<label class="control-label-inline"><span>Edit Instruction</span></label>
+										<input type="text" id="textEditInstruction" class="control-input" placeholder="e.g., Change headline to “Summer Sale — 40% Off”">
+									</div>
+									<div class="control-group-compact">
+										<label class="control-label-inline"><span>Style Preference (optional)</span></label>
+										<input type="text" id="textEditStyle" class="control-input" placeholder="e.g., Elegant serif, high contrast, centered">
+									</div>
+									<div class="linkedin-actions">
+										<button type="button" id="applyTextEditBtn" class="btn-primary" disabled>
+											<i class="fas fa-magic"></i>
+											<span>Apply Text Edit</span>
+										</button>
+									</div>
+									<div class="generation-status" id="textStudioStatus"></div>
+								</div>
+							</div>
+
+						<!-- End AD Studio Tab Content -->
+				</div>
+			</div>
+		</section>
+	</section>
+</main>
+
+	<!-- Loading Overlay -->
+	<div class="loading-overlay" id="loadingOverlay">
+		<div class="loading-content">
+			<div class="loading-spinner"></div>
+			<h4 id="loadingTitle">Generating Image...</h4>
+			<p id="loadingMessage">This may take a few moments</p>
+		</div>
+	</div>
+
+	<!-- JavaScript Modules -->
+	<script src="js/ai-editor/storage-manager.js" defer></script>
+	<script src="js/ai-editor/gemini-api.js" defer></script>
+	<script src="js/ai-editor/ui-manager.js" defer></script>
+	<!-- Layer Management (before konva-editor) -->
+	<script src="js/ai-editor/layer-manager.js" defer></script>
+	<script src="js/ai-editor/layer-panel-ui.js" defer></script>
+	<script src="js/ai-editor/konva-editor.js" defer></script>
+	<script src="js/ai-editor/background-removal.js" defer></script>
+	<script src="js/ai-editor/gallery-manager.js" defer></script>
+	<script src="js/ai-editor/object-transfer-manager.js" defer></script>
+	<script src="js/ai-editor/style-transfer-manager.js" defer></script>
+	<script src="js/ai-editor/linkedin-studio-manager.js" defer></script>
+	<script src="js/ai-editor/face-body-editor-manager.js" defer></script>
+	<script src="js/ai-editor/ad-studio-manager.js" defer></script>
+	<script src="js/ai-editor/text-editor-manager.js" defer></script>
+	<script src="js/ai-editor/prompt-enhancer.js" defer></script>
+	<script src="js/ai-editor/main.js" defer></script>
+</body>
+</html>

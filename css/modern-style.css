@@ -1,5 +1,30 @@
 /* Modern Dark Portfolio CSS */
 
+/* Animatable CSS custom properties for border gradient animations */
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --border-angle-1 {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@property --border-angle-2 {
+  syntax: '<angle>';
+  initial-value: 180deg;
+  inherits: false;
+}
+
+@property --pulse-pos {
+  syntax: '<percentage>';
+  initial-value: 0%;
+  inherits: false;
+}
+
 /* CSS Variables */
 :root {
   --primary-color: #00d4ff;
@@ -1504,18 +1529,20 @@ body {
   border: 1px solid rgba(0, 212, 255, 0.3);
   backdrop-filter: blur(20px);
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* Changed from hidden to allow border animation pseudo-element */
   transition: var(--transition);
   height: 800px;
   display: flex;
   flex-direction: column;
-  /* Performance optimization */
-  contain: layout style paint;
+  /* Performance optimization - removed 'paint' to allow pseudo-element overflow */
+  contain: layout style;
   /* Initial state for scroll-reveal animation */
   opacity: 0;
   transform: translateY(40px);
   /* Use will-change for GPU acceleration during animation */
   will-change: opacity, transform;
+  /* Create stacking context for z-index:-1 pseudo-element to work correctly */
+  isolation: isolate;
 }
 
 /* Cards that are already visible on page load (skip animation) */
@@ -1531,39 +1558,35 @@ body {
   will-change: auto; /* Remove will-change after animation for better performance */
 }
 
-/* Traveling light effect around border path only */
+/* Data pipe flow effect - animated border using @property for gradient rotation */
 .neon-card::before {
   content: '';
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border-radius: 22px;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    transparent 85%,
-    rgba(0, 212, 255, 0.3) 88%,
-    rgba(0, 212, 255, 1) 92%,
-    rgba(78, 205, 196, 1) 95%,
-    rgba(0, 212, 255, 1) 98%,
-    rgba(0, 212, 255, 0.3) 100%,
-    transparent 0deg
-  );
+  inset: 0;
+  border-radius: 20px;
+  border: 3px solid transparent;
+  /* Two backgrounds: solid inner + animated gradient border */
+  background:
+    linear-gradient(rgba(26, 26, 26, 1), rgba(26, 26, 26, 1)) padding-box,
+    conic-gradient(
+      from var(--border-angle, 0deg),
+      transparent 0%,
+      transparent 85%,
+      rgba(0, 212, 255, 0.15) 88%,
+      rgba(0, 212, 255, 0.4) 91%,
+      rgba(0, 212, 255, 0.7) 94%,
+      rgba(0, 212, 255, 1) 96%,
+      rgba(255, 255, 255, 1) 98%,
+      rgba(0, 212, 255, 0.6) 99%,
+      transparent 100%
+    ) border-box;
+  --border-angle: 0deg;
   opacity: 0;
-  z-index: -1;
-  animation: travelBorder 2.5s linear infinite;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  animation: borderRotate 1.8s linear infinite;
   animation-play-state: paused;
-  -webkit-mask:
-    linear-gradient(#000 0 0) padding-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(#000 0 0) padding-box,
-    linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  padding: 2px;
 }
 
 .neon-card.card-hover::before {
@@ -1571,7 +1594,7 @@ body {
   animation-play-state: running;
 }
 
-/* Background overlay */
+/* Background overlay on hover */
 .neon-card::after {
   content: '';
   position: absolute;
@@ -1579,6 +1602,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
+  border-radius: 20px;
   background: linear-gradient(135deg,
     rgba(0, 212, 255, 0.1) 0%,
     rgba(78, 205, 196, 0.1) 50%,
@@ -1586,6 +1610,7 @@ body {
   opacity: 0;
   transition: opacity 0.4s ease;
   z-index: 1;
+  pointer-events: none;
 }
 
 .neon-card.card-hover::after {
@@ -1924,6 +1949,26 @@ body {
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+/* Data pipe flow animation - smooth continuous rotation */
+@keyframes dataFlow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Border gradient rotation - animates only the gradient angle, not the element */
+@keyframes borderRotate {
+  0% {
+    --border-angle: 0deg;
+  }
+  100% {
+    --border-angle: 360deg;
   }
 }
 
@@ -3740,6 +3785,283 @@ body {
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   --stage-glow: 0;
   position: relative;
+  /* Default era colors (cyan) */
+  --era-primary: #00d4ff;
+  --era-secondary: #4ecdc4;
+  --era-glow: rgba(0, 212, 255, 0.3);
+}
+
+/* Era-specific color themes */
+.evolution-stage[data-era="foundation"] {
+  --era-primary: #f59e0b;
+  --era-secondary: #fbbf24;
+  --era-glow: rgba(245, 158, 11, 0.3);
+}
+
+.evolution-stage[data-era="expansion"] {
+  --era-primary: #3b82f6;
+  --era-secondary: #60a5fa;
+  --era-glow: rgba(59, 130, 246, 0.3);
+}
+
+.evolution-stage[data-era="innovation"] {
+  --era-primary: #a855f7;
+  --era-secondary: #c084fc;
+  --era-glow: rgba(168, 85, 247, 0.3);
+}
+
+.evolution-stage[data-era="ai"] {
+  --era-primary: #00d4ff;
+  --era-secondary: #4ecdc4;
+  --era-glow: rgba(0, 212, 255, 0.3);
+}
+
+.evolution-stage[data-era="current"] {
+  --era-primary: #10b981;
+  --era-secondary: #34d399;
+  --era-glow: rgba(16, 185, 129, 0.4);
+}
+
+/* ============================================
+   ANIMATED BORDER EFFECTS FOR EVOLUTION CARDS
+   5 Different animations - one per era
+   ============================================ */
+
+/* Base animated border on stage-container::after */
+.stage-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 25px;
+  border: 3px solid transparent;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 1; /* Below content (z-index: 2+) but above background */
+}
+
+/* Show animation on hover */
+.evolution-stage:hover .stage-container::after {
+  opacity: 1;
+}
+
+/* ---- ANIMATION 1: Dual Meeting Points (Foundation) ---- */
+.evolution-stage[data-era="foundation"] .stage-container::after {
+  --border-angle-1: 0deg;
+  --border-angle-2: 180deg;
+  background:
+    linear-gradient(rgba(26, 26, 26, 1), rgba(26, 26, 26, 1)) padding-box,
+    conic-gradient(
+      from var(--border-angle-1),
+      transparent 0%,
+      transparent 85%,
+      rgba(245, 158, 11, 0.3) 90%,
+      rgba(245, 158, 11, 1) 95%,
+      rgba(251, 191, 36, 1) 97%,
+      rgba(255, 255, 255, 1) 98%,
+      transparent 100%
+    ) border-box,
+    conic-gradient(
+      from var(--border-angle-2),
+      transparent 0%,
+      transparent 85%,
+      rgba(251, 191, 36, 0.3) 90%,
+      rgba(251, 191, 36, 1) 95%,
+      rgba(245, 158, 11, 1) 97%,
+      rgba(255, 255, 255, 1) 98%,
+      transparent 100%
+    ) border-box;
+  background-blend-mode: normal, lighten, lighten;
+  animation: dualMeeting 2.5s linear infinite;
+  animation-play-state: paused;
+}
+
+.evolution-stage[data-era="foundation"]:hover .stage-container::after {
+  animation-play-state: running;
+}
+
+/* ---- ANIMATION 2: Chase / Hunter (Expansion) ---- */
+.evolution-stage[data-era="expansion"] .stage-container::after {
+  --border-angle-1: 0deg;
+  --border-angle-2: 330deg;
+  background:
+    linear-gradient(rgba(26, 26, 26, 1), rgba(26, 26, 26, 1)) padding-box,
+    conic-gradient(
+      from var(--border-angle-1),
+      transparent 0%,
+      transparent 90%,
+      rgba(59, 130, 246, 0.5) 94%,
+      rgba(59, 130, 246, 1) 96%,
+      rgba(96, 165, 250, 1) 98%,
+      rgba(255, 255, 255, 1) 99%,
+      transparent 100%
+    ) border-box,
+    conic-gradient(
+      from var(--border-angle-2),
+      transparent 0%,
+      transparent 94%,
+      rgba(96, 165, 250, 0.3) 96%,
+      rgba(96, 165, 250, 0.6) 98%,
+      transparent 100%
+    ) border-box;
+  background-blend-mode: normal, lighten, lighten;
+  animation: chaseHunter 2s linear infinite;
+  animation-play-state: paused;
+}
+
+.evolution-stage[data-era="expansion"]:hover .stage-container::after {
+  animation-play-state: running;
+}
+
+/* ---- ANIMATION 3: Pulse Train (Innovation) ---- */
+.evolution-stage[data-era="innovation"] .stage-container::after {
+  --border-angle: 0deg;
+  background:
+    linear-gradient(rgba(26, 26, 26, 1), rgba(26, 26, 26, 1)) padding-box,
+    conic-gradient(
+      from var(--border-angle),
+      transparent 0%,
+      /* Pulse 1 */
+      rgba(168, 85, 247, 0.8) 8%,
+      rgba(192, 132, 252, 1) 10%,
+      transparent 12%,
+      /* Pulse 2 */
+      transparent 30%,
+      rgba(168, 85, 247, 0.8) 38%,
+      rgba(192, 132, 252, 1) 40%,
+      transparent 42%,
+      /* Pulse 3 */
+      transparent 60%,
+      rgba(168, 85, 247, 0.8) 68%,
+      rgba(192, 132, 252, 1) 70%,
+      transparent 72%,
+      transparent 100%
+    ) border-box;
+  animation: pulseTrain 3s linear infinite;
+  animation-play-state: paused;
+}
+
+.evolution-stage[data-era="innovation"]:hover .stage-container::after {
+  animation-play-state: running;
+}
+
+/* ---- ANIMATION 4: Counter-Rotation (AI) ---- */
+.evolution-stage[data-era="ai"] .stage-container::after {
+  --border-angle-1: 0deg;
+  --border-angle-2: 180deg;
+  background:
+    linear-gradient(rgba(26, 26, 26, 1), rgba(26, 26, 26, 1)) padding-box,
+    conic-gradient(
+      from var(--border-angle-1),
+      transparent 0%,
+      transparent 88%,
+      rgba(0, 212, 255, 0.4) 92%,
+      rgba(0, 212, 255, 1) 96%,
+      rgba(255, 255, 255, 1) 98%,
+      transparent 100%
+    ) border-box,
+    conic-gradient(
+      from var(--border-angle-2),
+      transparent 0%,
+      transparent 88%,
+      rgba(78, 205, 196, 0.4) 92%,
+      rgba(78, 205, 196, 1) 96%,
+      rgba(255, 255, 255, 1) 98%,
+      transparent 100%
+    ) border-box;
+  background-blend-mode: normal, lighten, lighten;
+  animation: counterRotate 2s linear infinite;
+  animation-play-state: paused;
+}
+
+.evolution-stage[data-era="ai"]:hover .stage-container::after {
+  animation-play-state: running;
+}
+
+/* ---- ANIMATION 5: Comet Tail (Current) ---- */
+.evolution-stage[data-era="current"] .stage-container::after {
+  --border-angle: 0deg;
+  background:
+    linear-gradient(rgba(26, 26, 26, 1), rgba(26, 26, 26, 1)) padding-box,
+    conic-gradient(
+      from var(--border-angle),
+      transparent 0%,
+      transparent 65%,
+      /* Long trailing glow */
+      rgba(16, 185, 129, 0.05) 70%,
+      rgba(16, 185, 129, 0.1) 75%,
+      rgba(16, 185, 129, 0.2) 80%,
+      rgba(16, 185, 129, 0.4) 85%,
+      rgba(16, 185, 129, 0.7) 90%,
+      rgba(52, 211, 153, 1) 95%,
+      rgba(255, 255, 255, 1) 98%,
+      rgba(16, 185, 129, 0.5) 99%,
+      transparent 100%
+    ) border-box;
+  animation: cometTail 2.2s linear infinite;
+  animation-play-state: paused;
+}
+
+.evolution-stage[data-era="current"]:hover .stage-container::after {
+  animation-play-state: running;
+}
+
+/* ---- KEYFRAMES FOR EVOLUTION CARD ANIMATIONS ---- */
+
+/* Animation 1: Two points meeting from opposite sides */
+@keyframes dualMeeting {
+  0% {
+    --border-angle-1: 0deg;
+    --border-angle-2: 180deg;
+  }
+  100% {
+    --border-angle-1: 360deg;
+    --border-angle-2: 540deg;
+  }
+}
+
+/* Animation 2: One chasing the other (30deg behind) */
+@keyframes chaseHunter {
+  0% {
+    --border-angle-1: 0deg;
+    --border-angle-2: 330deg;
+  }
+  100% {
+    --border-angle-1: 360deg;
+    --border-angle-2: 690deg;
+  }
+}
+
+/* Animation 3: Three pulses rotating together */
+@keyframes pulseTrain {
+  0% {
+    --border-angle: 0deg;
+  }
+  100% {
+    --border-angle: 360deg;
+  }
+}
+
+/* Animation 4: Two points going opposite directions */
+@keyframes counterRotate {
+  0% {
+    --border-angle-1: 0deg;
+    --border-angle-2: 180deg;
+  }
+  100% {
+    --border-angle-1: 360deg;
+    --border-angle-2: -180deg;
+  }
+}
+
+/* Animation 5: Single comet with long tail */
+@keyframes cometTail {
+  0% {
+    --border-angle: 0deg;
+  }
+  100% {
+    --border-angle: 360deg;
+  }
 }
 
 /* Mobile-specific Evolution stage optimizations */
@@ -3748,7 +4070,7 @@ body {
     transition: all 0.4s ease; /* Faster transitions on mobile */
   }
 
-  /* Ensure first expanded card is immediately visible on mobile */
+  /* Ensure expanded cards are visible on mobile */
   .evolution-stage.expanded {
     opacity: 1 !important;
     transform: translateX(0) !important;
@@ -3889,9 +4211,10 @@ body {
   backdrop-filter: blur(30px);
   padding: 1.75rem; /* Reduced from 2.5rem (28px instead of 40px) */
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* Changed from hidden to allow animated border */
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  isolation: isolate; /* Create stacking context for ::after animation */
 }
 
 .evolution-stage {
@@ -3914,25 +4237,11 @@ body {
   z-index: 1;
 }
 
-/* Only apply hover effects to stages without custom hover system */
-.evolution-stage:not(.evolution-hover-enabled):hover .stage-container::before {
-  opacity: 1;
+
+.evolution-stage:hover .stage-container {
+  transform: translateY(-10px);
 }
 
-.evolution-stage:not(.evolution-hover-enabled):hover .stage-container {
-  transform: translateY(-15px) scale(1.02);
-  border-color: rgba(0, 212, 255, 0.8);
-  box-shadow:
-    0 30px 60px rgba(0, 212, 255, 0.3),
-    0 0 100px rgba(0, 212, 255, 0.2);
-}
-
-/* Smooth transitions for custom hover elements */
-.evolution-stage.evolution-hover-enabled .company-card,
-.evolution-stage.evolution-hover-enabled .skill-node {
-  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  will-change: transform;
-}
 
 /* Stage Header */
 .stage-header {
@@ -3947,7 +4256,7 @@ body {
 .stage-icon {
   width: 80px;
   height: 80px;
-  background: var(--gradient-primary);
+  background: linear-gradient(135deg, var(--era-primary) 0%, var(--era-secondary) 100%);
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -3955,8 +4264,8 @@ body {
   font-size: 2rem;
   color: var(--text-primary);
   box-shadow:
-    0 10px 30px rgba(0, 212, 255, 0.3),
-    0 0 50px rgba(0, 212, 255, 0.1);
+    0 10px 30px var(--era-glow),
+    0 0 50px rgba(0, 0, 0, 0.1);
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
@@ -3980,15 +4289,6 @@ body {
   transition: opacity 0.4s ease;
 }
 
-/* Only apply to stages without custom hover system */
-.evolution-stage:not(.evolution-hover-enabled):hover .stage-icon {
-  transform: scale(1.1) rotate(5deg);
-  border-radius: 50%;
-}
-
-.evolution-stage:not(.evolution-hover-enabled):hover .stage-icon::before {
-  opacity: 1;
-}
 
 .stage-meta {
   flex: 1;
@@ -3996,7 +4296,7 @@ body {
 
 .stage-year {
   font-size: 1rem;
-  color: var(--primary-color);
+  color: var(--era-primary);
   font-weight: 600;
   letter-spacing: 2px;
   margin-bottom: 0.5rem;
@@ -4008,7 +4308,7 @@ body {
   font-weight: 800;
   color: var(--text-primary);
   margin: 0;
-  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-color) 100%);
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--era-primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -4019,8 +4319,8 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(0, 212, 255, 0.1);
-  border: 1px solid rgba(0, 212, 255, 0.3);
+  background: color-mix(in srgb, var(--era-primary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--era-primary) 30%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -4030,12 +4330,6 @@ body {
   pointer-events: none; /* Make it non-interactive since whole card is clickable */
 }
 
-/* Only apply to stages without custom hover system */
-.evolution-stage:not(.evolution-hover-enabled):hover .expand-button {
-  background: rgba(0, 212, 255, 0.2);
-  border-color: rgba(0, 212, 255, 0.6);
-  transform: scale(1.1);
-}
 
 .expand-button i {
   color: var(--primary-color);
@@ -4064,8 +4358,8 @@ body {
 
 /* Company Card */
 .company-card {
-  background: rgba(0, 212, 255, 0.1);
-  border: 1px solid rgba(0, 212, 255, 0.3);
+  background: color-mix(in srgb, var(--era-primary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--era-primary) 30%, transparent);
   border-radius: 15px;
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -4076,26 +4370,29 @@ body {
 }
 
 .company-card:hover {
-  background: rgba(0, 212, 255, 0.15);
-  border-color: rgba(0, 212, 255, 0.5);
+  background: color-mix(in srgb, var(--era-primary) 15%, transparent);
+  border-color: color-mix(in srgb, var(--era-primary) 50%, transparent);
   transform: translateY(-5px);
 }
 
 .company-logo {
   width: 60px;
   height: 60px;
-  background: var(--gradient-primary);
+  background: linear-gradient(135deg, var(--era-primary) 0%, var(--era-secondary) 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  font-weight: 800;
+  font-size: 1.6rem;
   color: var(--text-primary);
-  box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 5px 20px var(--era-glow);
   /* Maintain square aspect ratio */
   flex-shrink: 0;
   aspect-ratio: 1 / 1;
+}
+
+.company-logo i {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .company-info h4 {
@@ -4124,8 +4421,8 @@ body {
 }
 
 .skill-node {
-  background: rgba(78, 205, 196, 0.1);
-  border: 1px solid rgba(78, 205, 196, 0.3);
+  background: color-mix(in srgb, var(--era-secondary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--era-secondary) 30%, transparent);
   border-radius: 25px;
   padding: 0.625rem 1rem; /* Reduced from 0.8rem 1.2rem (10px 16px instead of 12.8px 19.2px) */
   position: relative;
@@ -4134,15 +4431,15 @@ body {
 }
 
 .skill-node:hover {
-  background: rgba(78, 205, 196, 0.2);
-  border-color: rgba(78, 205, 196, 0.6);
+  background: color-mix(in srgb, var(--era-secondary) 20%, transparent);
+  border-color: color-mix(in srgb, var(--era-secondary) 60%, transparent);
   transform: translateY(-3px);
 }
 
 .skill-name {
   font-size: 0.8125rem; /* Reduced from 0.9rem (13px instead of 14.4px) */
   font-weight: 500;
-  color: var(--accent-color);
+  color: var(--era-secondary);
 }
 
 .skill-connections {
@@ -4176,8 +4473,8 @@ body {
 }
 
 .detailed-description {
-  background: rgba(0, 212, 255, 0.05);
-  border: 1px solid rgba(0, 212, 255, 0.2);
+  background: color-mix(in srgb, var(--era-primary) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--era-primary) 20%, transparent);
   border-radius: 15px;
   padding: 1.25rem; /* Reduced from 2rem (20px instead of 32px) */
   color: var(--text-secondary);
@@ -4190,14 +4487,14 @@ body {
   font-size: 1.125rem; /* Reduced from 1.3rem (18px instead of 20.8px) */
   font-weight: 600;
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-color) 100%);
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--era-primary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .detailed-description h5 {
-  color: var(--primary-color);
+  color: var(--era-primary);
   font-size: 1rem; /* Reduced from 1.1rem (16px instead of 17.6px) */
   font-weight: 600;
   margin: 1.5rem 0 0.75rem 0;
@@ -4214,7 +4511,7 @@ body {
 }
 
 .detailed-description li strong {
-  color: var(--accent-color);
+  color: var(--era-secondary);
   font-weight: 600;
 }
 
@@ -4238,8 +4535,8 @@ body {
   flex: 1;
   height: 3px;
   background: linear-gradient(90deg,
-    var(--primary-color) 0%,
-    var(--accent-color) 100%);
+    var(--era-primary) 0%,
+    var(--era-secondary) 100%);
   border-radius: 2px;
   position: relative;
   overflow: hidden;
@@ -4262,14 +4559,14 @@ body {
 .arrow-head {
   width: 0;
   height: 0;
-  border-left: 15px solid var(--accent-color);
+  border-left: 15px solid var(--era-secondary);
   border-top: 8px solid transparent;
   border-bottom: 8px solid transparent;
 }
 
 .transformation-text {
   font-size: 0.8rem;
-  color: var(--accent-color);
+  color: var(--era-secondary);
   font-weight: 600;
   letter-spacing: 1px;
   white-space: nowrap;
@@ -4466,5 +4763,92 @@ body {
   }
   100% {
     left: 100%;
+  }
+}
+
+/* ================================================
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   ================================================ */
+
+/* Reduce backdrop-filter blur on mobile - expensive GPU operation */
+@media (max-width: 768px) {
+  .navbar {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .neon-card {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .evolution-stage .stage-container {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .terminal-window {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .video-modal .modal-content {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  /* Disable orbital animations on mobile for performance */
+  .orbit {
+    animation-play-state: paused !important;
+  }
+
+  /* Simplify gradients on mobile */
+  .hero-background {
+    background: var(--bg-primary);
+  }
+
+  /* Reduce shadow complexity on mobile */
+  .neon-card,
+  .evolution-stage .stage-container,
+  .terminal-window {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Hide particle canvas on mobile for better performance */
+  #globalParticleCanvas {
+    display: none;
+  }
+}
+
+/* Reduced motion support - comprehensive */
+@media (prefers-reduced-motion: reduce) {
+  .orbit {
+    animation: none !important;
+  }
+
+  .profile-glow {
+    animation: none !important;
+  }
+
+  .floating-icon {
+    animation: none !important;
+  }
+
+  .pulse-ring {
+    display: none !important;
+  }
+
+  .particle-canvas,
+  #globalParticleCanvas {
+    display: none !important;
+  }
+
+  .wave-svg .wave {
+    animation: none !important;
+  }
+
+  .connection-line,
+  .data-particle {
+    animation: none !important;
   }
 }

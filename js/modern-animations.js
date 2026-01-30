@@ -239,13 +239,12 @@ function initTypingAnimation() {
     console.log('⌨️ [TYPING] ✅ Marked typing animation as initialized');
 
     const titles = [
-        'Sales Strategist',
-        'Problem Solver',
-        'AI Enthusiast',
+        'Marketing Manager',
+        'AI Specialist',
+        'Team Leader',
+        'Data Analyst',
         'Web Developer',
-        'Automation Expert',
-        'Virtual Assistant',
-        'Creative Professional'
+        'Automation Expert'
     ];
 
     let currentIndex = 0;
@@ -300,18 +299,35 @@ function initProfileImageScrollRotation() {
         return;
     }
 
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+        console.log('🎬 [PROFILE] Reduced motion preferred - skipping scroll rotation');
+        return;
+    }
+
     console.log('🎬 [PROFILE] Initializing profile image scroll rotation...');
 
+    const isMobile = window.innerWidth <= 768;
     let lastScrollY = window.pageYOffset;
     let ticking = false;
+    let lastUpdateTime = 0;
+    const throttleInterval = isMobile ? 66 : 16;  // ~15fps on mobile, ~60fps on desktop
 
     function updateProfileRotation() {
+        const now = Date.now();
+        if (now - lastUpdateTime < throttleInterval) {
+            ticking = false;
+            return;
+        }
+        lastUpdateTime = now;
+
         const scrollY = window.pageYOffset;
         const scrollDelta = scrollY - lastScrollY;
 
         // Calculate rotation based on scroll position and direction
-        const maxRotation = 15; // Maximum rotation in degrees
-        const scrollSensitivity = 0.1;
+        const maxRotation = isMobile ? 10 : 15; // Reduced rotation on mobile
+        const scrollSensitivity = isMobile ? 0.05 : 0.1;  // Reduced sensitivity on mobile
 
         // Get current rotation or start from 0
         const currentTransform = profileImage.style.transform || '';
@@ -334,7 +350,7 @@ function initProfileImageScrollRotation() {
         anime({
             targets: profileImage,
             rotate: newRotation,
-            duration: 300,
+            duration: isMobile ? 400 : 300,  // Slightly longer on mobile for smoothness
             easing: 'easeOutQuad'
         });
 
@@ -482,6 +498,16 @@ function initCTAPulseEffects() {
         return;
     }
 
+    // Check for mobile and reduced motion
+    const isMobile = window.innerWidth <= 768;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Skip continuous pulse on mobile for performance
+    if (isMobile || prefersReducedMotion) {
+        console.log('🎬 [CTA] Continuous pulse disabled (mobile or reduced motion)');
+        // Still add hover effects on mobile, just no continuous pulse
+    }
+
     console.log('🎬 [CTA] Initializing pulse effects for', ctaButtons.length, 'buttons...');
 
     ctaButtons.forEach((button, index) => {
@@ -512,8 +538,11 @@ function initCTAPulseEffects() {
 
         button.appendChild(pulseRing);
 
-        // Continuous pulse animation with staggered timing
+        // Continuous pulse animation with staggered timing - only on desktop
         function startPulse() {
+            // Skip on mobile for performance
+            if (isMobile || prefersReducedMotion) return;
+
             anime({
                 targets: pulseRing,
                 scale: [1, 1.5],
@@ -527,8 +556,10 @@ function initCTAPulseEffects() {
             });
         }
 
-        // Start pulse with staggered delay
-        setTimeout(startPulse, 3000 + (index * 500));
+        // Start pulse with staggered delay - only on desktop
+        if (!isMobile && !prefersReducedMotion) {
+            setTimeout(startPulse, 3000 + (index * 500));
+        }
 
         // Enhanced hover effects
         button.addEventListener('mouseenter', function() {
@@ -1097,7 +1128,7 @@ function initEvolutionAnimations() {
                 }
             });
         }, {
-            threshold: window.innerWidth <= 768 ? 0.1 : 0.3, // Lower threshold for mobile
+            threshold: window.innerWidth <= 768 ? 0.1 : 0.3,
             rootMargin: window.innerWidth <= 768 ? '0px 0px -20px 0px' : '0px 0px -50px 0px'
         });
 
@@ -1106,13 +1137,9 @@ function initEvolutionAnimations() {
 
     // Initialize scroll-based navigation tracking
     initEvolutionScrollTracking();
-
-    // Removed legacy stage click handler to avoid double-toggle
-    // Expansion is handled exclusively in initInteractiveEvolution()
-    // initializeStageClickHandlers();
 }
 
-// Enhanced stage entrance with state management
+// Stage entrance animation
 function animateStageEntrance(stage, index) {
     // Check if already animated to prevent conflicts
     if (stage.hasAttribute('data-animated') || stage.hasAttribute('data-animation-state')) {
@@ -1131,8 +1158,8 @@ function animateStageEntrance(stage, index) {
 
     // Mobile-optimized animation settings
     const isMobile = window.innerWidth <= 768;
-    const duration = isMobile ? 400 : 800; // Faster on mobile
-    const easing = isMobile ? 'easeOutQuad' : 'easeOutElastic(1, .8)'; // Simpler easing on mobile
+    const duration = isMobile ? 400 : 800;
+    const easing = isMobile ? 'easeOutQuad' : 'easeOutElastic(1, .8)';
 
     // Animate stage container entrance
     anime({
@@ -1152,7 +1179,7 @@ function animateStageEntrance(stage, index) {
     });
 }
 
-// Enhanced stage components animation with completion tracking
+// Stage components animation
 function animateStageComponents(stage, index) {
     // Animate stage icon
     anime({
@@ -1220,94 +1247,20 @@ function animateStageComponents(stage, index) {
     });
 }
 
-// Non-conflicting hover effects for evolution stages
+// Simplified hover effects for evolution stages - card lift + border glow only (CSS-based)
 function initializeStageHoverEffects(stage, index) {
     // Only initialize if animation is completed
     if (stage.getAttribute('data-animation-state') !== 'completed') {
-        console.log(`🎬 [EVOLUTION] Delaying hover effects for stage ${index + 1} - animation not completed`);
         return;
     }
 
     // Remove from magnetic system to prevent conflicts
     stage.classList.remove('magnetic');
 
-    // Add custom hover class for identification
-    stage.classList.add('evolution-hover-enabled');
-
-    console.log(`🎬 [EVOLUTION] Initializing hover effects for stage ${index + 1}`);
-
-    // Subtle hover effects that don't conflict with entrance animations
-    stage.addEventListener('mouseenter', function() {
-        // Only apply hover if not currently animating
-        if (stage.getAttribute('data-animation-state') === 'completed') {
-            // Subtle glow effect
-            anime({
-                targets: stage,
-                '--stage-glow': [0, 1],
-                duration: 300,
-                easing: 'easeOutQuad'
-            });
-
-            // Subtle scale on company card only
-            const companyCard = stage.querySelector('.company-card');
-            if (companyCard) {
-                anime({
-                    targets: companyCard,
-                    scale: [1, 1.05],
-                    duration: 300,
-                    easing: 'easeOutQuad'
-                });
-            }
-
-            // Enhance skill nodes
-            const skillNodes = stage.querySelectorAll('.skill-node');
-            if (skillNodes.length > 0) {
-                anime({
-                    targets: skillNodes,
-                    scale: [1, 1.1],
-                    duration: 200,
-                    easing: 'easeOutQuad',
-                    delay: anime.stagger(50)
-                });
-            }
-        }
-    });
-
-    stage.addEventListener('mouseleave', function() {
-        // Reset hover effects
-        if (stage.getAttribute('data-animation-state') === 'completed') {
-            // Remove glow
-            anime({
-                targets: stage,
-                '--stage-glow': [1, 0],
-                duration: 400,
-                easing: 'easeOutQuad'
-            });
-
-            // Reset company card scale
-            const companyCard = stage.querySelector('.company-card');
-            if (companyCard) {
-                anime({
-                    targets: companyCard,
-                    scale: [1.05, 1],
-                    duration: 400,
-                    easing: 'easeOutQuad'
-                });
-            }
-
-            // Reset skill nodes
-            const skillNodes = stage.querySelectorAll('.skill-node');
-            if (skillNodes.length > 0) {
-                anime({
-                    targets: skillNodes,
-                    scale: [1.1, 1],
-                    duration: 300,
-                    easing: 'easeOutQuad',
-                    delay: anime.stagger(30)
-                });
-            }
-        }
-    });
+    // Hover effects are now handled entirely by CSS for smooth performance
+    // - Card lift: .evolution-stage:hover .stage-container { transform: translateY(-10px); }
+    // - Border glow: .evolution-stage:hover .stage-container::after { opacity: 1; animation-play-state: running; }
+    console.log(`🎬 [EVOLUTION] Stage ${index + 1} hover ready (CSS-based)`);
 }
 
 // Initialize stage click handlers to prevent navigation conflicts
@@ -2101,26 +2054,20 @@ function initTerminalContact() {
 
 // Initialize EmailJS
 function initEmailJS() {
-    // Initialize EmailJS with your public key
-    // You need to replace 'YOUR_PUBLIC_KEY' with your actual EmailJS public key
-    // Get it from: https://dashboard.emailjs.com/admin/account
-    emailjs.init('YOUR_PUBLIC_KEY'); // Replace with your actual public key
+    emailjs.init('j0nvAPduOu1xiJ-8D');
 }
 
 // Email sending function using EmailJS
 function sendEmail(email, subject, message) {
     return new Promise((resolve, reject) => {
-        // EmailJS service configuration
-        // You need to set up these values in your EmailJS dashboard:
-        const serviceID = 'YOUR_SERVICE_ID'; // Replace with your EmailJS service ID
-        const templateID = 'YOUR_TEMPLATE_ID'; // Replace with your EmailJS template ID
+        const serviceID = 'service_568rrrb';
+        const templateID = 'template_1el7lpc';
 
         const templateParams = {
-            from_email: email,
-            from_name: email.split('@')[0], // Extract name from email
-            subject: subject,
-            message: message,
-            to_email: 'your.email@domain.com' // Replace with your actual email
+            email: email,
+            name: email.split('@')[0],
+            title: subject,
+            message: message
         };
 
         emailjs.send(serviceID, templateID, templateParams)
@@ -2179,7 +2126,7 @@ function addTerminalOutput(text, type = 'system') {
     terminalOutput.scrollTop = terminalOutput.scrollHeight;
 }
 
-// Terminal animations on scroll
+// Terminal animations on scroll - triggers early
 function initTerminalAnimations() {
     const terminalObserver = new IntersectionObserver(function(entries) {
         entries.forEach(entry => {
@@ -2189,8 +2136,8 @@ function initTerminalAnimations() {
             }
         });
     }, {
-        threshold: 0.3,
-        rootMargin: '0px 0px -100px 0px'
+        threshold: 0.1,
+        rootMargin: '50px 0px 0px 0px'
     });
 
     const contactSection = document.querySelector('#contact');
@@ -2199,7 +2146,7 @@ function initTerminalAnimations() {
     }
 }
 
-// Terminal sequence with smooth animations
+// Terminal sequence with typing animation (fast)
 function startTerminalSequence() {
     const terminal = document.querySelector('.terminal-window');
     const outputLines = document.querySelectorAll('.output-line');
@@ -2207,66 +2154,54 @@ function startTerminalSequence() {
 
     if (!terminal) return;
 
-    // Step 1: Terminal expansion animation
+    // Quick terminal expansion
     anime({
         targets: terminal,
-        scale: [0.1, 1.05, 1],
+        scale: [0.9, 1],
         opacity: [0, 1],
-        duration: 1500,
-        easing: 'easeOutElastic(1, .8)',
+        duration: 300,
+        easing: 'easeOutQuad',
         complete: function() {
-            // Step 2: Start typing sequence after terminal is expanded
             startTypingSequence(outputLines, terminalForm);
         }
     });
 }
 
-// Typing sequence for terminal output
+// Typing sequence for terminal output (fast character-by-character)
 function startTypingSequence(outputLines, terminalForm) {
     let currentLine = 0;
 
     function typeNextLine() {
         if (currentLine >= outputLines.length) {
-            // All lines typed, show the form
             showTerminalForm(terminalForm);
             return;
         }
 
         const line = outputLines[currentLine];
-        const prompt = line.querySelector('.prompt');
         const command = line.querySelector('.command');
-        const timestamp = line.querySelector('.timestamp');
         const message = line.querySelector('.message');
 
-        // Show the line first
-        anime({
-            targets: line,
-            opacity: [0, 1],
-            translateX: [-20, 0],
-            duration: 300,
-            easing: 'easeOutQuad',
-            complete: function() {
-                // Type the content
-                if (command) {
-                    typeText(command, 50, function() {
-                        currentLine++;
-                        setTimeout(typeNextLine, 300);
-                    });
-                } else if (message) {
-                    typeText(message, 30, function() {
-                        currentLine++;
-                        setTimeout(typeNextLine, 500);
-                    });
-                } else {
-                    currentLine++;
-                    setTimeout(typeNextLine, 200);
-                }
-            }
-        });
+        // Show line instantly
+        line.style.opacity = '1';
+
+        // Type the content fast
+        if (command) {
+            typeText(command, 12, function() {
+                currentLine++;
+                setTimeout(typeNextLine, 150);
+            });
+        } else if (message) {
+            typeText(message, 8, function() {
+                currentLine++;
+                setTimeout(typeNextLine, 100);
+            });
+        } else {
+            currentLine++;
+            setTimeout(typeNextLine, 50);
+        }
     }
 
-    // Start typing the first line after a short delay
-    setTimeout(typeNextLine, 500);
+    setTimeout(typeNextLine, 100);
 }
 
 // Type text character by character
@@ -2288,17 +2223,16 @@ function typeText(element, speed, callback) {
     }, speed);
 }
 
-// Show terminal form
+// Show terminal form (instant appearance)
 function showTerminalForm(terminalForm) {
     if (!terminalForm) return;
 
     anime({
         targets: terminalForm,
         opacity: [0, 1],
-        translateY: [30, 0],
-        duration: 800,
-        easing: 'easeOutQuad',
-        delay: 500
+        translateY: [10, 0],
+        duration: 250,
+        easing: 'easeOutQuad'
     });
 }
 
@@ -2367,8 +2301,19 @@ function initMouseTrailParticles() {
     const backgroundParticles = [];
     // Mobile-optimized particle counts and performance settings
     const isMobile = window.innerWidth <= 768;
-    const maxParticles = isMobile ? 20 : 60;
-    const maxBackgroundParticles = isMobile ? 50 : 150;
+    const maxParticles = isMobile ? 10 : 60;  // Reduced from 20 to 10 on mobile
+    const maxBackgroundParticles = isMobile ? 25 : 150;  // Reduced from 50 to 25 on mobile
+
+    // Frame rate throttling for mobile
+    let lastFrameTime = 0;
+    const targetFPS = isMobile ? 30 : 60;  // 30fps on mobile, 60fps on desktop
+    const frameInterval = 1000 / targetFPS;
+
+    // Visibility state for pausing when tab is hidden
+    let isPageVisible = true;
+
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     // Disable cursor trail on mobile for better performance
     if (isMobile) {
@@ -2479,16 +2424,16 @@ function initMouseTrailParticles() {
             ctx.fillStyle = this.color;
             ctx.fill();
 
-            // Subtle glow for larger particles
-            if (this.size > 1.5) {
+            // Subtle glow for larger particles - disabled on mobile for performance
+            if (this.size > 1.5 && !isMobile) {
                 ctx.shadowBlur = 8;
                 ctx.shadowColor = this.color;
                 ctx.globalAlpha = alpha * 0.3;
                 ctx.fill();
             }
 
-            // Cross-shaped twinkle for brightest stars
-            if (this.size > 1.8 && twinkle > 0.8) {
+            // Cross-shaped twinkle for brightest stars - disabled on mobile for performance
+            if (this.size > 1.8 && twinkle > 0.8 && !isMobile) {
                 ctx.globalAlpha = alpha * 0.5;
                 ctx.strokeStyle = this.color;
                 ctx.lineWidth = 0.5;
@@ -2750,17 +2695,19 @@ function initMouseTrailParticles() {
             // Draw shape based on current state
             this.drawShape();
 
-            // Enhanced glow effect based on behavior
-            const glowIntensity = this.calculateGlowIntensity();
-            if (glowIntensity > 0) {
-                ctx.shadowBlur = glowIntensity;
-                ctx.shadowColor = this.color;
-                ctx.globalAlpha = (this.life * 0.4) + (this.energy * 0.3);
-                this.drawShape();
-            }
+            // Enhanced glow effect based on behavior - disabled on mobile for performance
+            if (!isMobile) {
+                const glowIntensity = this.calculateGlowIntensity();
+                if (glowIntensity > 0) {
+                    ctx.shadowBlur = glowIntensity;
+                    ctx.shadowColor = this.color;
+                    ctx.globalAlpha = (this.life * 0.4) + (this.energy * 0.3);
+                    this.drawShape();
+                }
 
-            // Special effects for different states
-            this.drawSpecialEffects();
+                // Special effects for different states
+                this.drawSpecialEffects();
+            }
 
             ctx.restore();
         }
@@ -3139,7 +3086,23 @@ function initMouseTrailParticles() {
     }
 
     // Smart animation loop with layered particle system and advanced behaviors
-    function animate() {
+    function animate(currentTime) {
+        // Skip animation if page is not visible or reduced motion is preferred
+        if (!isPageVisible || prefersReducedMotion) {
+            requestAnimationFrame(animate);
+            return;
+        }
+
+        // Frame rate throttling for mobile performance
+        if (isMobile) {
+            const elapsed = currentTime - lastFrameTime;
+            if (elapsed < frameInterval) {
+                requestAnimationFrame(animate);
+                return;
+            }
+            lastFrameTime = currentTime - (elapsed % frameInterval);
+        }
+
         ctx.clearRect(0, 0, globalCanvas.width, globalCanvas.height);
 
         // Update section colors
@@ -3211,6 +3174,17 @@ function initMouseTrailParticles() {
     // Initialize the deep space background
     initializeBackgroundParticles();
 
+    // Visibility change handler - pause animations when page is hidden
+    document.addEventListener('visibilitychange', function() {
+        isPageVisible = !document.hidden;
+        if (isPageVisible) {
+            lastFrameTime = performance.now();  // Reset frame timing when becoming visible
+            console.log('🖱️ [GLOBAL PARTICLES] Page visible - resuming animations');
+        } else {
+            console.log('🖱️ [GLOBAL PARTICLES] Page hidden - pausing animations');
+        }
+    });
+
     // Start the global system
     document.addEventListener('mousemove', handleGlobalMouseMove, { passive: true });
     document.addEventListener('click', handleGlobalClick, { passive: true });
@@ -3218,9 +3192,10 @@ function initMouseTrailParticles() {
     // Add scroll listener for section detection
     window.addEventListener('scroll', updateSectionColors, { passive: true });
 
-    animate();
+    animate(performance.now());
     console.log('🖱️ [SMART PARTICLES] ✅ Smart deep space particle system with advanced behaviors started');
     console.log(`🌌 [DEEP SPACE] Background: ${maxBackgroundParticles} particles | Interactive: ${maxParticles} particles`);
+    console.log(`📱 [MOBILE] Mode: ${isMobile ? 'ENABLED' : 'DISABLED'} | Target FPS: ${targetFPS}`);
     console.log('🧠 [SMART BEHAVIORS] Shape-changing, magnetic attraction, idle states, and particle pooling active');
 }
 

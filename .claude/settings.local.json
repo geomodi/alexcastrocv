@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(copy \"C:\\\\Users\\\\modin\\\\downloads\\\\myws\\\\css\\\\modern-style.css\" \"C:\\\\Users\\\\modin\\\\downloads\\\\myws\\\\css\\\\modern-style.min.css\")",
+      "WebFetch(domain:8020rei.com)",
+      "WebFetch(domain:www.linkedin.com)",
+      "WebFetch(domain:careers.8020rei.com)",
+      "WebFetch(domain:www.getonbrd.com)"
+    ]
+  }
+}
